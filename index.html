@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -40,7 +40,7 @@ body {
 .header h1 span { color: var(--accent); }
 .header-meta { text-align: right; color: var(--text-dim); font-size: 13px; }
 .header-meta .live { color: var(--green); font-weight: 600; }
-.header-meta .live::before { content: '??; margin-right: 4px; animation: blink 2s infinite; }
+.header-meta .live::before { content: '●'; margin-right: 4px; animation: blink 2s infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 /* Tabs */
@@ -71,9 +71,9 @@ body {
 
 .status-badge { font-size: 12px; font-weight: 600; }
 .status-badge.online { color: var(--green); }
-.status-badge.online::before { content: '??'; }
+.status-badge.online::before { content: '● '; }
 .status-badge.offline { color: var(--red); }
-.status-badge.offline::before { content: '??'; }
+.status-badge.offline::before { content: '● '; }
 
 /* GPU Bars */
 .gpu-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
@@ -173,13 +173,6 @@ body {
 .event-detail .ev-user { font-size: 14px; font-weight: 600; }
 .event-detail .ev-time { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
 .event-detail .ev-note { font-size: 12px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
-.event-detail .ev-delete {
-  margin-top: 8px; padding: 4px 12px; font-size: 11px; font-weight: 600;
-  background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3);
-  border-radius: 6px; cursor: pointer; transition: all 0.15s;
-}
-.event-detail .ev-delete:hover { background: rgba(239,68,68,0.25); }
-.event-detail:hover { border-left-color: var(--accent-light); }
 
 /* Add Schedule Form */
 .add-form {
@@ -239,6 +232,13 @@ body {
 }
 .gpu-checkbox-item input[type="checkbox"] { display: none; }
 
+/* Delete button */
+.event-detail .ev-delete {
+  margin-top: 8px; padding: 4px 12px; font-size: 11px; font-weight: 600;
+  background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.event-detail .ev-delete:hover { background: rgba(239,68,68,0.25); }
 
 /* Responsive */
 @media (max-width: 900px) {
@@ -312,10 +312,10 @@ body {
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
     <h2><span>ISPL</span> Dashboard</h2>
-    <p>?곌뎄??援ъ꽦?먮쭔 ?묎렐?????덉뒿?덈떎</p>
-    <input type="password" id="loginPassword" placeholder="鍮꾨?踰덊샇 ?낅젰" onkeydown="if(event.key==='Enter')doLogin()">
-    <button onclick="doLogin()">濡쒓렇??/button>
-    <div class="error" id="loginError">鍮꾨?踰덊샇媛 ??몄뒿?덈떎</div>
+    <p>연구실 구성원만 접근할 수 있습니다</p>
+    <input type="password" id="loginPassword" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">로그인</button>
+    <div class="error" id="loginError">비밀번호가 틀렸습니다</div>
   </div>
 </div>
 
@@ -337,19 +337,19 @@ body {
   <!-- Tabs & Timezone -->
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
     <div class="tabs" style="margin-bottom:0;">
-      <button class="tab active" onclick="switchTab('monitor')">?쒕쾭 紐⑤땲?곕쭅</button>
-      <button class="tab" onclick="switchTab('schedule')">?ㅼ?以?愿由?/button>
+      <button class="tab active" onclick="switchTab('monitor')">서버 모니터링</button>
+      <button class="tab" onclick="switchTab('schedule')">스케줄 관리</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <label style="font-size:12px;color:var(--text-dim);">?쒓컙?:</label>
+      <label style="font-size:12px;color:var(--text-dim);">시간대:</label>
       <select id="timezoneSelect" style="padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;cursor:pointer;">
-        <option value="Asia/Seoul">?눖?눟 KST (?쒖슱)</option>
-        <option value="UTC">?뙋 UTC</option>
-        <option value="America/New_York">?눣?눡 EST (?댁슃)</option>
-        <option value="America/Los_Angeles">?눣?눡 PST (LA)</option>
-        <option value="Europe/London">?눐?눉 GMT (?곕뜕)</option>
-        <option value="Asia/Tokyo">?눓?눝 JST (?꾩퓙)</option>
-        <option value="Asia/Shanghai">?눊?눛 CST (?곹븯??</option>
+        <option value="Asia/Seoul">🇰🇷 KST (서울)</option>
+        <option value="UTC">🌐 UTC</option>
+        <option value="America/New_York">🇺🇸 EST (뉴욕)</option>
+        <option value="America/Los_Angeles">🇺🇸 PST (LA)</option>
+        <option value="Europe/London">🇬🇧 GMT (런던)</option>
+        <option value="Asia/Tokyo">🇯🇵 JST (도쿄)</option>
+        <option value="Asia/Shanghai">🇨🇳 CST (상하이)</option>
       </select>
     </div>
   </div>
@@ -358,7 +358,7 @@ body {
   <div class="monitor-section active" id="monitorSection">
     <div class="summary-bar" id="summaryBar"></div>
     <div class="servers-grid" id="serversGrid">
-      <div class="loading"><div class="spinner"></div>?쒕쾭 ?곹깭瑜?遺덈윭?ㅻ뒗 以?..</div>
+      <div class="loading"><div class="spinner"></div>서버 상태를 불러오는 중...</div>
     </div>
   </div>
 
@@ -367,29 +367,29 @@ body {
     <div class="calendar-container">
       <div class="calendar-panel">
         <div class="calendar-nav">
-          <button onclick="changeMonth(-1)">?</button>
+          <button onclick="changeMonth(-1)">◀</button>
           <h2 id="calendarTitle"></h2>
-          <button onclick="changeMonth(1)">??/button>
-          <button onclick="goToday()" style="margin-left:auto">?ㅻ뒛</button>
+          <button onclick="changeMonth(1)">▶</button>
+          <button onclick="goToday()" style="margin-left:auto">오늘</button>
         </div>
         <div class="calendar-grid" id="calendarGrid"></div>
       </div>
       <div class="detail-panel">
-        <h3 id="detailTitle">?좎쭨瑜??좏깮?섏꽭??/h3>
+        <h3 id="detailTitle">날짜를 선택하세요</h3>
         <div id="detailContent">
-          <p style="color:var(--text-dim);font-size:13px;">罹섎┛?붿뿉???좎쭨瑜??대┃?섎㈃ ?대떦 ?쇱쓽 ?덉빟???뺤씤?????덉뒿?덈떎.</p>
+          <p style="color:var(--text-dim);font-size:13px;">캘린더에서 날짜를 클릭하면 해당 일의 예약을 확인할 수 있습니다.</p>
         </div>
         <div class="add-form" id="addForm" style="display:none;">
-          <h3>?덉빟 ?깅줉</h3>
+          <h3>예약 등록</h3>
           <div class="form-row">
-            <label>?대쫫</label>
-            <input type="text" id="formUser" placeholder="?? 源?숉샇">
+            <label>이름</label>
+            <input type="text" id="formUser" placeholder="예: 김동호">
           </div>
           <div class="form-row">
-            <label>?쒕쾭</label>
+            <label>서버</label>
             <select id="formServer">
-              <option value="NIPA_server">NIPA_server (GPU 1횞80GB)</option>
-              <option value="ISPL">ISPL (GPU 8횞48GB)</option>
+              <option value="NIPA_server">NIPA_server (GPU 1×80GB)</option>
+              <option value="ISPL">ISPL (GPU 8×48GB)</option>
               <option value="CPU1">CPU1</option>
               <option value="CPU2">CPU2</option>
               <option value="CPU3">CPU3</option>
@@ -397,7 +397,7 @@ body {
             </select>
           </div>
           <div class="form-row" id="gpuSelectRow">
-            <label>GPU ?좏깮 (ISPL ?쒕쾭留??대떦)</label>
+            <label>GPU 선택 (ISPL 서버만 해당)</label>
             <div class="gpu-selected-tags" id="gpuSelectedTags"></div>
             <div class="gpu-checkbox-grid" id="gpuCheckboxGrid">
               <label class="gpu-checkbox-item" data-gpu="0"><input type="checkbox" value="0">GPU 0</label>
@@ -411,19 +411,19 @@ body {
             </div>
           </div>
           <div class="form-row">
-            <label>?쒖옉 ?쒓컙 <span id="formTzLabel" style="color:var(--accent);font-size:11px;"></span></label>
+            <label>시작 시간 <span id="formTzLabel" style="color:var(--accent);font-size:11px;"></span></label>
             <input type="time" id="formStart" value="09:00">
           </div>
           <div class="form-row">
-            <label>醫낅즺 ?쒓컙</label>
+            <label>종료 시간</label>
             <input type="time" id="formEnd" value="18:00">
           </div>
           <div class="form-row">
-            <label>硫붾え (?좏깮)</label>
-            <textarea id="formNote" placeholder="?? 3DGS training, epoch 200"></textarea>
+            <label>메모 (선택)</label>
+            <textarea id="formNote" placeholder="예: 3DGS training, epoch 200"></textarea>
           </div>
-          <button class="btn-submit" onclick="submitSchedule()">?덉빟 ?깅줉</button>
-          <button class="btn-cancel" onclick="cancelForm()">痍⑥냼</button>
+          <button class="btn-submit" onclick="submitSchedule()">예약 등록</button>
+          <button class="btn-cancel" onclick="cancelForm()">취소</button>
         </div>
       </div>
     </div>
@@ -438,7 +438,8 @@ body {
 // ============================
 const DATA_URL = 'data/server_status.json';
 const SCHEDULE_URL = 'data/schedule.json';
-const REFRESH_INTERVAL = 5 * 60 * 1000; // 5遺?
+const REFRESH_INTERVAL = 5 * 60 * 1000; // 5분
+
 const SERVER_COLORS = {
   'NIPA_server': 'nipa',
   'ISPL': 'ispl-srv',
@@ -465,7 +466,7 @@ function formatInTZ(date, options = {}) {
 }
 
 function nowInTZ() {
-  // ?꾩옱 ?쒓컖???좏깮??timezone 湲곗??쇰줈 YYYY-MM-DD ?뺤떇 諛섑솚
+  // 현재 시각을 선택된 timezone 기준으로 YYYY-MM-DD 형식 반환
   const parts = new Intl.DateTimeFormat('en-CA', { timeZone: currentTimezone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
   const y = parts.find(p => p.type === 'year').value;
   const m = parts.find(p => p.type === 'month').value;
@@ -502,7 +503,7 @@ async function fetchServerStatus() {
     const resp = await fetch(DATA_URL + '?t=' + Date.now());
     if (!resp.ok) throw new Error('fetch failed');
     serverData = await resp.json();
-    // ?ㅼ젣 ?곗씠?곗씤吏 ?먮퀎: ?쒕쾭 諛곗뿴??鍮꾩뼱?덇굅??last_updated媛 珥덇린媛믪씠硫??곕え
+    // 실제 데이터인지 판별: 서버 배열이 비어있거나 last_updated가 초기값이면 데모
     isDemo = !serverData.servers || serverData.servers.length === 0;
     if (isDemo) {
       serverData = getDemoData();
@@ -534,15 +535,15 @@ function updateTimestamp() {
   if (!serverData) return;
   const d = new Date(serverData.last_updated);
   const timeStr = formatInTZ(d, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  document.getElementById('lastUpdated').textContent = `留덉?留??낅뜲?댄듃: ${timeStr} (${tzAbbr()})`;
+  document.getElementById('lastUpdated').textContent = `마지막 업데이트: ${timeStr} (${tzAbbr()})`;
 
   const srcEl = document.getElementById('dataSource');
   if (isDemo) {
-    srcEl.innerHTML = '<span style="color:var(--yellow);">???곕え ?곗씠????SSH ?섏쭛 ?곌껐 ??/span>';
+    srcEl.innerHTML = '<span style="color:var(--yellow);">⚠ 데모 데이터 — SSH 수집 연결 전</span>';
     document.getElementById('liveIndicator').textContent = 'Demo';
     document.getElementById('liveIndicator').style.color = 'var(--yellow)';
   } else {
-    srcEl.innerHTML = '<span style="color:var(--green);">?ㅼ떆媛??섏쭛 以?/span>';
+    srcEl.innerHTML = '<span style="color:var(--green);">실시간 수집 중</span>';
     document.getElementById('liveIndicator').textContent = 'Live';
     document.getElementById('liveIndicator').style.color = 'var(--green)';
   }
@@ -572,19 +573,19 @@ function renderMonitor() {
 
   document.getElementById('summaryBar').innerHTML = `
     <div class="summary-card">
-      <div class="sc-label">?⑤씪???쒕쾭</div>
+      <div class="sc-label">온라인 서버</div>
       <div class="sc-value online">${online} <span style="font-size:14px;color:var(--text-dim)">/ ${servers.length}</span></div>
     </div>
     <div class="summary-card">
-      <div class="sc-label">?ㅽ봽?쇱씤 ?쒕쾭</div>
+      <div class="sc-label">오프라인 서버</div>
       <div class="sc-value ${offline > 0 ? 'offline' : ''}">${offline}</div>
     </div>
     <div class="summary-card">
-      <div class="sc-label">GPU ?ъ슜 ?꾪솴</div>
+      <div class="sc-label">GPU 사용 현황</div>
       <div class="sc-value">${usedGPU} <span style="font-size:14px;color:var(--text-dim)">/ ${totalGPU}</span></div>
     </div>
     <div class="summary-card">
-      <div class="sc-label">?묒냽 ?ъ슜??/div>
+      <div class="sc-label">접속 사용자</div>
       <div class="sc-value">${[...new Set(servers.flatMap(s => s.users || []))].length}</div>
     </div>
   `;
@@ -606,7 +607,7 @@ function renderServerCard(s) {
           <span class="gpu-label">GPU ${g.index}</span>
           <div class="bar-container">
             <div class="bar-fill gpu" style="width:${g.utilization}%"></div>
-            <span class="bar-text">${g.utilization}% 쨌 ${(g.memory_used_mb/1024).toFixed(1)}/${(g.memory_total_mb/1024).toFixed(0)}GB 쨌 ${g.temperature}째C</span>
+            <span class="bar-text">${g.utilization}% · ${(g.memory_used_mb/1024).toFixed(1)}/${(g.memory_total_mb/1024).toFixed(0)}GB · ${g.temperature}°C</span>
           </div>
         </div>`;
     }).join('') + '</div>';
@@ -622,31 +623,31 @@ function renderServerCard(s) {
         <span class="gpu-label">CPU</span>
         <div class="bar-container">
           <div class="bar-fill cpu-bar" style="width:${Math.min(cpuPct,100)}%"></div>
-          <span class="bar-text">${cpuPct}% 쨌 ${s.cpu.cores || '?'} cores 쨌 load ${s.cpu.load_avg || '?'}</span>
+          <span class="bar-text">${cpuPct}% · ${s.cpu.cores || '?'} cores · load ${s.cpu.load_avg || '?'}</span>
         </div>
       </div>
       <div class="gpu-item">
         <span class="gpu-label">RAM</span>
         <div class="bar-container">
           <div class="bar-fill mem" style="width:${Math.min(memPct,100)}%"></div>
-          <span class="bar-text">${memPct}% 쨌 ${((s.memory.used_mb||0)/1024).toFixed(1)}/${((s.memory.total_mb||0)/1024).toFixed(0)}GB</span>
+          <span class="bar-text">${memPct}% · ${((s.memory.used_mb||0)/1024).toFixed(1)}/${((s.memory.total_mb||0)/1024).toFixed(0)}GB</span>
         </div>
       </div>`;
   }
 
   let usersHTML = '';
   if (isOnline && s.users && s.users.length) {
-    usersHTML = `<div class="users-section"><h4>?묒냽 ?ъ슜??/h4>${s.users.map(u => `<span class="user-tag">${u}</span>`).join('')}</div>`;
+    usersHTML = `<div class="users-section"><h4>접속 사용자</h4>${s.users.map(u => `<span class="user-tag">${u}</span>`).join('')}</div>`;
   }
 
   let processHTML = '';
   if (isOnline && s.gpu_processes && s.gpu_processes.length) {
-    processHTML = `<div class="users-section"><h4>GPU ?꾨줈?몄뒪</h4><div class="process-list">${
+    processHTML = `<div class="users-section"><h4>GPU 프로세스</h4><div class="process-list">${
       s.gpu_processes.map(p => `<div class="process-item"><span>${p.name}</span><span>${(p.memory_mb/1024).toFixed(1)}GB</span></div>`).join('')
     }</div></div>`;
   }
 
-  const typeLabel = isGPU ? `GPU ${s.gpu_count}횞 ${s.gpu_memory_gb}GB` : 'CPU';
+  const typeLabel = isGPU ? `GPU ${s.gpu_count}× ${s.gpu_memory_gb}GB` : 'CPU';
   const typeClass = isGPU ? 'gpu' : 'cpu';
 
   return `
@@ -664,7 +665,7 @@ function renderServerCard(s) {
       ${processHTML}
       ${isOnline && s.disk ? `
       <div class="stats-row">
-        <div class="stat"><div class="stat-label">?붿뒪??/div><div class="stat-value">${s.disk.used} / ${s.disk.total}</div></div>
+        <div class="stat"><div class="stat-label">디스크</div><div class="stat-value">${s.disk.used} / ${s.disk.total}</div></div>
         <div class="stat"><div class="stat-label">Host</div><div class="stat-value" style="font-size:11px">${s.host || '-'}</div></div>
       </div>` : ''}
     </div>`;
@@ -676,32 +677,33 @@ function renderServerCard(s) {
 function renderCalendar() {
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
-  document.getElementById('calendarTitle').textContent = `${year}??${month + 1}??;
+  document.getElementById('calendarTitle').textContent = `${year}년 ${month + 1}월`;
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const startDow = firstDay.getDay(); // 0=Sun
   const totalDays = lastDay.getDate();
 
-  const todayStr = nowInTZ(); // timezone 湲곗? ?ㅻ뒛 ?좎쭨
+  const todayStr = nowInTZ(); // timezone 기준 오늘 날짜
 
-  let html = ['??,'??,'??,'??,'紐?,'湲?,'??].map(d => `<div class="cal-header-cell">${d}</div>`).join('');
+  let html = ['일','월','화','수','목','금','토'].map(d => `<div class="cal-header-cell">${d}</div>`).join('');
 
-  // ?댁쟾 ??鍮??
+  // 이전 달 빈 셀
   const prevLast = new Date(year, month, 0).getDate();
   for (let i = startDow - 1; i >= 0; i--) {
     const d = prevLast - i;
     html += `<div class="cal-cell other-month"><span class="day-num">${d}</span></div>`;
   }
 
-  // ?꾩옱 ??  for (let d = 1; d <= totalDays; d++) {
+  // 현재 달
+  for (let d = 1; d <= totalDays; d++) {
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = dateStr === todayStr;
     const events = getEventsForDate(dateStr);
     const evHTML = events.slice(0, 3).map(ev => {
       const cls = SERVER_COLORS[ev.server] || 'cpu-srv';
-      return `<div class="cal-event ${cls}" title="${ev.user}: ${ev.server} ${ev.start_time}-${ev.end_time}">${ev.user} 쨌 ${ev.server}</div>`;
-    }).join('') + (events.length > 3 ? `<div style="font-size:10px;color:var(--text-dim)">+${events.length-3}媛???/div>` : '');
+      return `<div class="cal-event ${cls}" title="${ev.user}: ${ev.server} ${ev.start_time}-${ev.end_time}">${ev.user} · ${ev.server}</div>`;
+    }).join('') + (events.length > 3 ? `<div style="font-size:10px;color:var(--text-dim)">+${events.length-3}개 더</div>` : '');
 
     html += `<div class="cal-cell ${isToday ? 'today' : ''}" onclick="selectDate('${dateStr}')">
       <span class="day-num">${d}</span>
@@ -709,7 +711,7 @@ function renderCalendar() {
     </div>`;
   }
 
-  // ?ㅼ쓬 ??鍮??
+  // 다음 달 빈 셀
   const remaining = 7 - ((startDow + totalDays) % 7);
   if (remaining < 7) {
     for (let d = 1; d <= remaining; d++) {
@@ -728,16 +730,15 @@ function selectDate(dateStr) {
   selectedDate = dateStr;
   const events = getEventsForDate(dateStr);
   const d = new Date(dateStr + 'T00:00:00');
-  const title = `${d.getFullYear()}??${d.getMonth()+1}??${d.getDate()}??;
+  const title = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
 
   document.getElementById('detailTitle').textContent = title;
 
   if (events.length === 0) {
-    document.getElementById('detailContent').innerHTML = `<p style="color:var(--text-dim);font-size:13px;">???좎뿉 ?깅줉???덉빟???놁뒿?덈떎.</p>`;
+    document.getElementById('detailContent').innerHTML = `<p style="color:var(--text-dim);font-size:13px;">이 날에 등록된 예약이 없습니다.</p>`;
   } else {
-    document.getElementById('detailContent').innerHTML = events.map((ev, idx) => {
+    document.getElementById('detailContent').innerHTML = events.map(ev => {
       const gpuInfo = ev.gpus ? `<div class="ev-time">GPU: ${ev.gpus.join(', ')}</div>` : '';
-      const evIdx = scheduleData.indexOf(ev);
       return `
         <div class="event-detail">
           <div class="ev-server">${ev.server}</div>
@@ -745,7 +746,7 @@ function selectDate(dateStr) {
           <div class="ev-time">${ev.start_time} ~ ${ev.end_time}</div>
           ${gpuInfo}
           ${ev.note ? `<div class="ev-note">${ev.note}</div>` : ''}
-          <button class="ev-delete" onclick="deleteSchedule(${evIdx})">예약 취소</button>
+          <button class="ev-delete" onclick="deleteSchedule(${scheduleData.indexOf(ev)})">예약 취소</button>
         </div>`;
     }).join('');
   }
@@ -774,7 +775,6 @@ document.getElementById('formServer').addEventListener('change', function() {
   if (this.value !== 'ISPL') clearGPUSelection();
 });
 
-// GPU multi-select with tags
 function getSelectedGPUs() {
   const checkboxes = document.querySelectorAll('#gpuCheckboxGrid input[type="checkbox"]:checked');
   return Array.from(checkboxes).map(cb => parseInt(cb.value));
@@ -821,7 +821,7 @@ function submitSchedule() {
   const note = document.getElementById('formNote').value.trim();
 
   if (!user || !selectedDate) {
-    alert('?대쫫怨??좎쭨瑜??좏깮?댁＜?몄슂.');
+    alert('이름과 날짜를 선택해주세요.');
     return;
   }
 
@@ -842,19 +842,19 @@ function submitSchedule() {
 
   scheduleData.push(newEvent);
 
-  // ?덈궡: ?ㅼ젣 ?댁쁺 ?쒖뿉??GitHub API瑜??듯빐 而ㅻ컠?섍굅??Issues???깅줉
+  // 안내: 실제 운영 시에는 GitHub API를 통해 커밋하거나 Issues에 등록
   const jsonStr = JSON.stringify(newEvent, null, 2);
   const instructions = `
-?덉빟??濡쒖뺄??異붽??섏뿀?듬땲??
+예약이 로컬에 추가되었습니다.
 
-?ㅼ젣濡???ν븯?ㅻ㈃ ?ㅼ쓬 以??섎굹瑜??섑뻾?섏꽭??
+실제로 저장하려면 다음 중 하나를 수행하세요:
 
-1. data/schedule.json ?뚯씪???꾨옒 ?댁슜??異붽??섍퀬 而ㅻ컠:
+1. data/schedule.json 파일에 아래 내용을 추가하고 커밋:
 ${jsonStr}
 
-2. ?먮뒗 GitHub Issue濡??깅줉:
-   ?쒕ぉ: [Schedule] ${user} - ${server} (${selectedDate})
-   蹂몃Ц: ??JSON ?댁슜
+2. 또는 GitHub Issue로 등록:
+   제목: [Schedule] ${user} - ${server} (${selectedDate})
+   본문: 위 JSON 내용
   `;
 
   alert(instructions);
@@ -879,18 +879,13 @@ function deleteSchedule(index) {
   scheduleData.splice(index, 1);
 
   const jsonStr = JSON.stringify(scheduleData, null, 2);
-  const instructions = `예약이 취소되었습니다.
-
-실제로 반영하려면 data/schedule.json을 아래 내용으로 교체하고 커밋하세요:
-${jsonStr}`;
-
-  alert(instructions);
+  alert(`예약이 취소되었습니다.\n\n실제로 반영하려면 data/schedule.json을 업데이트하고 커밋하세요.`);
   renderCalendar();
   if (selectedDate) selectDate(selectedDate);
 }
 
 // ============================
-// Demo data (GitHub Pages 諛고룷 ???뚯뒪?몄슜)
+// Demo data (GitHub Pages 배포 전 테스트용)
 // ============================
 function getDemoData() {
   return {
@@ -972,12 +967,12 @@ function getDemoSchedule() {
   const dayAfter = new Date(today); dayAfter.setDate(today.getDate()+2);
 
   return [
-    { date: fmt(today), user: "?숉샇", server: "NIPA_server", start_time: "09:00", end_time: "18:00", note: "3DGS anti-aliasing ?ㅽ뿕" },
-    { date: fmt(today), user: "誘쇱닔", server: "ISPL", start_time: "10:00", end_time: "22:00", gpus: [0, 1], note: "NeRF training" },
-    { date: fmt(today), user: "吏??, server: "ISPL", start_time: "14:00", end_time: "20:00", gpus: [3, 6], note: "Evaluation" },
-    { date: fmt(tomorrow), user: "?숉샇", server: "ISPL", start_time: "09:00", end_time: "23:00", gpus: [0, 1, 2, 3], note: "Multi-GPU training" },
-    { date: fmt(tomorrow), user: "?섏쭊", server: "CPU1", start_time: "10:00", end_time: "17:00", note: "?곗씠???꾩쿂由? },
-    { date: fmt(dayAfter), user: "誘쇱닔", server: "NIPA_server", start_time: "00:00", end_time: "23:59", note: "Long training run" }
+    { date: fmt(today), user: "동호", server: "NIPA_server", start_time: "09:00", end_time: "18:00", note: "3DGS anti-aliasing 실험" },
+    { date: fmt(today), user: "민수", server: "ISPL", start_time: "10:00", end_time: "22:00", gpus: [0, 1], note: "NeRF training" },
+    { date: fmt(today), user: "지현", server: "ISPL", start_time: "14:00", end_time: "20:00", gpus: [3, 6], note: "Evaluation" },
+    { date: fmt(tomorrow), user: "동호", server: "ISPL", start_time: "09:00", end_time: "23:00", gpus: [0, 1, 2, 3], note: "Multi-GPU training" },
+    { date: fmt(tomorrow), user: "수진", server: "CPU1", start_time: "10:00", end_time: "17:00", note: "데이터 전처리" },
+    { date: fmt(dayAfter), user: "민수", server: "NIPA_server", start_time: "00:00", end_time: "23:59", note: "Long training run" }
   ];
 }
 
@@ -985,12 +980,13 @@ function getDemoSchedule() {
 // Init
 // ============================
 (async function init() {
-  // Timezone selector 珥덇린??  const tzSelect = document.getElementById('timezoneSelect');
+  // Timezone selector 초기화
+  const tzSelect = document.getElementById('timezoneSelect');
   tzSelect.value = currentTimezone;
   tzSelect.addEventListener('change', function() {
     currentTimezone = this.value;
     try { localStorage.setItem('tz', currentTimezone); } catch(e) {}
-    // ?꾩껜 UI 媛깆떊
+    // 전체 UI 갱신
     updateTimestamp();
     renderCalendar();
     if (selectedDate) selectDate(selectedDate);
@@ -1000,7 +996,6 @@ function getDemoSchedule() {
   startAutoRefresh();
   // GPU select visibility
   document.getElementById('gpuSelectRow').style.display = 'none';
-  clearGPUSelection();
 })();
 
 // ===== Login System =====
@@ -1039,4 +1034,3 @@ if (sessionStorage.getItem('ispl_dash_auth') === 'true') {
 </div><!-- end dashboard-content -->
 </body>
 </html>
-
