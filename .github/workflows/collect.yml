@@ -1,0 +1,67 @@
+name: Collect Server Status
+
+on:
+  # NIPA 서버에서 cron으로 수집하므로 Actions cron은 비활성화
+  # schedule:
+  #   - cron: '*/5 * * * *'
+  workflow_dispatch: # 수동 실행 (백업용)
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key and config
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # NIPA 서버(외부) known host 등록
+          ssh-keyscan -p 22 ${{ secrets.NIPA_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          # SSH config - Jump Host 설정 (IP는 Secrets에서)
+          cat >> ~/.ssh/config << SSHCONFIG
+          Host nipa-jump
+            HostName ${{ secrets.NIPA_IP }}
+            Port 22
+            User ${{ secrets.NIPA_USER }}
+            StrictHostKeyChecking no
+            IdentityFile ~/.ssh/id_rsa
+
+          Host 10.*
+            ProxyJump nipa-jump
+            StrictHostKeyChecking no
+            IdentityFile ~/.ssh/id_rsa
+          SSHCONFIG
+          chmod 600 ~/.ssh/config
+
+      - name: Collect server status
+        env:
+          NIPA_IP: ${{ secrets.NIPA_IP }}
+          NIPA_USER: ${{ secrets.NIPA_USER }}
+          ISPL_IP: ${{ secrets.ISPL_IP }}
+          ISPL_USER: ${{ secrets.ISPL_USER }}
+          CPU1_IP: ${{ secrets.CPU1_IP }}
+          CPU2_IP: ${{ secrets.CPU2_IP }}
+          CPU3_IP: ${{ secrets.CPU3_IP }}
+          CPU4_IP: ${{ secrets.CPU4_IP }}
+          CPU_USER: ${{ secrets.CPU_USER }}
+        run: |
+          chmod +x scripts/collect_status.sh
+          bash scripts/collect_status.sh
+
+      - name: Commit and push
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add data/server_status.json
+          git diff --cached --quiet || git commit -m "Update server status [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git push

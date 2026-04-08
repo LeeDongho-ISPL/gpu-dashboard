@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISPL Server Dashboard</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --card: #1a1d2e;
+  --card-hover: #222640;
+  --border: #2a2e45;
+  --text: #e1e4ed;
+  --text-dim: #8b8fa3;
+  --accent: #6c7aff;
+  --accent-light: #8b96ff;
+  --green: #34d399;
+  --red: #f87171;
+  --yellow: #fbbf24;
+  --orange: #fb923c;
+  --gpu-bar: linear-gradient(90deg, #6c7aff, #a78bfa);
+  --mem-bar: linear-gradient(90deg, #34d399, #6ee7b7);
+  --cpu-bar: linear-gradient(90deg, #fbbf24, #fcd34d);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+}
+.header h1 { font-size: 24px; font-weight: 700; }
+.header h1 span { color: var(--accent); }
+.header-meta { text-align: right; color: var(--text-dim); font-size: 13px; }
+.header-meta .live { color: var(--green); font-weight: 600; }
+.header-meta .live::before { content: '●'; margin-right: 4px; animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--card); border-radius: 10px; padding: 4px; width: fit-content; }
+.tab {
+  padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--text-dim); transition: all 0.2s; border: none; background: none;
+}
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--accent); color: #fff; }
+
+/* Server Cards */
+.servers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; }
+.server-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; transition: all 0.2s;
+}
+.server-card:hover { border-color: var(--accent); background: var(--card-hover); }
+.server-card.offline { opacity: 0.5; }
+
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.card-header h3 { font-size: 18px; font-weight: 600; }
+.server-type {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; text-transform: uppercase;
+}
+.server-type.gpu { background: rgba(108,122,255,0.15); color: var(--accent-light); }
+.server-type.cpu { background: rgba(251,191,36,0.15); color: var(--yellow); }
+
+.status-badge { font-size: 12px; font-weight: 600; }
+.status-badge.online { color: var(--green); }
+.status-badge.online::before { content: '● '; }
+.status-badge.offline { color: var(--red); }
+.status-badge.offline::before { content: '● '; }
+
+/* GPU Bars */
+.gpu-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.gpu-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.gpu-label { width: 55px; color: var(--text-dim); font-size: 12px; flex-shrink: 0; }
+.bar-container { flex: 1; height: 22px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; min-width: 2px; }
+.bar-fill.gpu { background: var(--gpu-bar); }
+.bar-fill.mem { background: var(--mem-bar); }
+.bar-fill.cpu-bar { background: var(--cpu-bar); }
+.bar-text {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font-size: 11px; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Stats row */
+.stats-row { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+.stat {
+  background: rgba(255,255,255,0.03); border-radius: 8px; padding: 8px 12px;
+  font-size: 12px; flex: 1; min-width: 80px;
+}
+.stat-label { color: var(--text-dim); margin-bottom: 2px; }
+.stat-value { font-weight: 600; font-size: 14px; }
+
+/* Users */
+.users-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.users-section h4 { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+.user-tag {
+  display: inline-block; background: rgba(108,122,255,0.12); color: var(--accent-light);
+  padding: 3px 10px; border-radius: 12px; font-size: 12px; margin: 2px 4px 2px 0;
+}
+
+/* GPU Processes */
+.process-list { margin-top: 8px; }
+.process-item {
+  font-size: 11px; color: var(--text-dim); padding: 3px 0;
+  display: flex; justify-content: space-between;
+}
+
+/* ============================== */
+/* Schedule / Calendar Section    */
+/* ============================== */
+.schedule-section { display: none; }
+.schedule-section.active { display: block; }
+.monitor-section { display: none; }
+.monitor-section.active { display: block; }
+
+/* Calendar */
+.calendar-container { display: flex; gap: 20px; flex-wrap: wrap; }
+.calendar-panel { flex: 1; min-width: 320px; }
+.calendar-nav { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.calendar-nav button {
+  background: var(--card); border: 1px solid var(--border); color: var(--text);
+  padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px;
+}
+.calendar-nav button:hover { border-color: var(--accent); }
+.calendar-nav h2 { font-size: 20px; }
+
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+  background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border);
+}
+.cal-header-cell {
+  padding: 10px; text-align: center; font-size: 12px; font-weight: 600;
+  color: var(--text-dim); background: rgba(255,255,255,0.03);
+}
+.cal-cell {
+  min-height: 90px; padding: 6px 8px; background: var(--card); cursor: pointer;
+  border: 1px solid transparent; transition: all 0.15s; position: relative;
+}
+.cal-cell:hover { background: var(--card-hover); border-color: var(--accent); }
+.cal-cell.other-month { opacity: 0.3; }
+.cal-cell.today { border-color: var(--accent); background: rgba(108,122,255,0.05); }
+.cal-cell .day-num { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.cal-cell.today .day-num { color: var(--accent); }
+
+.cal-event {
+  font-size: 10px; padding: 2px 5px; border-radius: 4px; margin-bottom: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+}
+.cal-event.nipa { background: rgba(108,122,255,0.2); color: var(--accent-light); }
+.cal-event.ispl-srv { background: rgba(52,211,153,0.2); color: var(--green); }
+.cal-event.cpu-srv { background: rgba(251,191,36,0.2); color: var(--yellow); }
+
+/* Schedule Detail Panel */
+.detail-panel {
+  width: 380px; min-width: 380px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+}
+.detail-panel h3 { font-size: 16px; margin-bottom: 16px; }
+
+.event-detail {
+  background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px; margin-bottom: 8px;
+  border-left: 3px solid var(--accent);
+}
+.event-detail .ev-server { font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
+.event-detail .ev-user { font-size: 14px; font-weight: 600; }
+.event-detail .ev-time { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.event-detail .ev-note { font-size: 12px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
+
+/* Add Schedule Form */
+.add-form {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; margin-top: 20px;
+}
+.add-form h3 { font-size: 16px; margin-bottom: 16px; }
+.form-row { margin-bottom: 12px; }
+.form-row label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+.form-row input, .form-row select, .form-row textarea {
+  width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  font-size: 14px; font-family: inherit;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+  outline: none; border-color: var(--accent);
+}
+.form-row textarea { resize: vertical; min-height: 60px; }
+.btn-submit {
+  background: var(--accent); color: #fff; border: none; padding: 10px 24px;
+  border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;
+}
+.btn-submit:hover { background: var(--accent-light); }
+.btn-cancel {
+  background: none; color: var(--text-dim); border: 1px solid var(--border);
+  padding: 10px 24px; border-radius: 8px; font-size: 14px; cursor: pointer;
+  width: 100%; margin-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .servers-grid { grid-template-columns: 1fr; }
+  .calendar-container { flex-direction: column; }
+  .detail-panel { width: 100%; min-width: unset; }
+}
+
+/* Loading */
+.loading { text-align: center; padding: 60px; color: var(--text-dim); }
+.loading .spinner {
+  width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Summary bar */
+.summary-bar {
+  display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.summary-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 20px; flex: 1; min-width: 150px;
+}
+.summary-card .sc-label { font-size: 12px; color: var(--text-dim); }
+.summary-card .sc-value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+.summary-card .sc-value.online { color: var(--green); }
+.summary-card .sc-value.offline { color: var(--red); }
+
+/* Tooltip */
+.tooltip {
+  position: fixed; background: #2a2e45; border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px; font-size: 12px; z-index: 1000;
+  pointer-events: none; max-width: 280px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  display: none;
+}
+
+/* Login Overlay */
+.login-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--bg); z-index: 9999; display: flex;
+  align-items: center; justify-content: center;
+}
+.login-box {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 40px; width: 360px; text-align: center;
+}
+.login-box h2 { font-size: 22px; margin-bottom: 8px; }
+.login-box h2 span { color: var(--accent); }
+.login-box p { color: var(--text-dim); font-size: 13px; margin-bottom: 24px; }
+.login-box input {
+  width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  font-size: 15px; text-align: center; margin-bottom: 16px;
+}
+.login-box input:focus { outline: none; border-color: var(--accent); }
+.login-box button {
+  width: 100%; padding: 12px; background: var(--accent); color: #fff;
+  border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+  cursor: pointer;
+}
+.login-box button:hover { background: var(--accent-light); }
+.login-box .error { color: var(--red); font-size: 12px; margin-top: 8px; display: none; }
+.dashboard-content { display: none; }
+.dashboard-content.unlocked { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Login Overlay -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2><span>ISPL</span> Dashboard</h2>
+    <p>연구실 구성원만 접근할 수 있습니다</p>
+    <input type="password" id="loginPassword" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">로그인</button>
+    <div class="error" id="loginError">비밀번호가 틀렸습니다</div>
+  </div>
+</div>
+
+<div class="dashboard-content" id="dashboardContent">
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1><span>ISPL</span> Server Dashboard</h1>
+    </div>
+    <div class="header-meta">
+      <div class="live" id="liveIndicator">Live</div>
+      <div id="lastUpdated">Loading...</div>
+      <div id="nextRefresh"></div>
+      <div id="dataSource" style="font-size:11px;margin-top:2px;"></div>
+    </div>
+  </div>
+
+  <!-- Tabs & Timezone -->
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+    <div class="tabs" style="margin-bottom:0;">
+      <button class="tab active" onclick="switchTab('monitor')">서버 모니터링</button>
+      <button class="tab" onclick="switchTab('schedule')">스케줄 관리</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <label style="font-size:12px;color:var(--text-dim);">시간대:</label>
+      <select id="timezoneSelect" style="padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;cursor:pointer;">
+        <option value="Asia/Seoul">🇰🇷 KST (서울)</option>
+        <option value="UTC">🌐 UTC</option>
+        <option value="America/New_York">🇺🇸 EST (뉴욕)</option>
+        <option value="America/Los_Angeles">🇺🇸 PST (LA)</option>
+        <option value="Europe/London">🇬🇧 GMT (런던)</option>
+        <option value="Asia/Tokyo">🇯🇵 JST (도쿄)</option>
+        <option value="Asia/Shanghai">🇨🇳 CST (상하이)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ====== Monitor Tab ====== -->
+  <div class="monitor-section active" id="monitorSection">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div class="servers-grid" id="serversGrid">
+      <div class="loading"><div class="spinner"></div>서버 상태를 불러오는 중...</div>
+    </div>
+  </div>
+
+  <!-- ====== Schedule Tab ====== -->
+  <div class="schedule-section" id="scheduleSection">
+    <div class="calendar-container">
+      <div class="calendar-panel">
+        <div class="calendar-nav">
+          <button onclick="changeMonth(-1)">◀</button>
+          <h2 id="calendarTitle"></h2>
+          <button onclick="changeMonth(1)">▶</button>
+          <button onclick="goToday()" style="margin-left:auto">오늘</button>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+      <div class="detail-panel">
+        <h3 id="detailTitle">날짜를 선택하세요</h3>
+        <div id="detailContent">
+          <p style="color:var(--text-dim);font-size:13px;">캘린더에서 날짜를 클릭하면 해당 일의 예약을 확인할 수 있습니다.</p>
+        </div>
+        <div class="add-form" id="addForm" style="display:none;">
+          <h3>예약 등록</h3>
+          <div class="form-row">
+            <label>이름</label>
+            <input type="text" id="formUser" placeholder="예: 김동호">
+          </div>
+          <div class="form-row">
+            <label>서버</label>
+            <select id="formServer">
+              <option value="NIPA_server">NIPA_server (GPU 1×80GB)</option>
+              <option value="ISPL">ISPL (GPU 8×48GB)</option>
+              <option value="CPU1">CPU1</option>
+              <option value="CPU2">CPU2</option>
+              <option value="CPU3">CPU3</option>
+              <option value="CPU4">CPU4</option>
+            </select>
+          </div>
+          <div class="form-row" id="gpuSelectRow">
+            <label>GPU 선택 (ISPL 서버만 해당)</label>
+            <select id="formGPU" multiple size="4" style="height:auto;">
+              <option value="0">GPU 0</option>
+              <option value="1">GPU 1</option>
+              <option value="2">GPU 2</option>
+              <option value="3">GPU 3</option>
+              <option value="4">GPU 4</option>
+              <option value="5">GPU 5</option>
+              <option value="6">GPU 6</option>
+              <option value="7">GPU 7</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>시작 시간 <span id="formTzLabel" style="color:var(--accent);font-size:11px;"></span></label>
+            <input type="time" id="formStart" value="09:00">
+          </div>
+          <div class="form-row">
+            <label>종료 시간</label>
+            <input type="time" id="formEnd" value="18:00">
+          </div>
+          <div class="form-row">
+            <label>메모 (선택)</label>
+            <textarea id="formNote" placeholder="예: 3DGS training, epoch 200"></textarea>
+          </div>
+          <button class="btn-submit" onclick="submitSchedule()">예약 등록</button>
+          <button class="btn-cancel" onclick="cancelForm()">취소</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ============================
+// Config
+// ============================
+const DATA_URL = 'data/server_status.json';
+const SCHEDULE_URL = 'data/schedule.json';
+const REFRESH_INTERVAL = 5 * 60 * 1000; // 5분
+
+const SERVER_COLORS = {
+  'NIPA_server': 'nipa',
+  'ISPL': 'ispl-srv',
+  'CPU1': 'cpu-srv', 'CPU2': 'cpu-srv', 'CPU3': 'cpu-srv', 'CPU4': 'cpu-srv'
+};
+
+// ============================
+// State
+// ============================
+let serverData = null;
+let scheduleData = [];
+let currentMonth = new Date();
+let selectedDate = null;
+let refreshTimer = null;
+let isDemo = false;
+let currentTimezone = localStorage.getItem('tz') || 'Asia/Seoul';
+
+// ============================
+// Timezone utilities
+// ============================
+function formatInTZ(date, options = {}) {
+  const defaults = { timeZone: currentTimezone };
+  return new Date(date).toLocaleString('ko-KR', { ...defaults, ...options });
+}
+
+function nowInTZ() {
+  // 현재 시각을 선택된 timezone 기준으로 YYYY-MM-DD 형식 반환
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: currentTimezone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+  const y = parts.find(p => p.type === 'year').value;
+  const m = parts.find(p => p.type === 'month').value;
+  const d = parts.find(p => p.type === 'day').value;
+  return `${y}-${m}-${d}`;
+}
+
+function timeInTZ(date) {
+  return new Date(date).toLocaleTimeString('ko-KR', { timeZone: currentTimezone, hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function tzAbbr() {
+  const opt = { timeZone: currentTimezone, timeZoneName: 'short' };
+  const str = new Date().toLocaleString('en-US', opt);
+  return str.split(' ').pop();
+}
+
+// ============================
+// Tab switching
+// ============================
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('monitorSection').classList.toggle('active', tab === 'monitor');
+  document.getElementById('scheduleSection').classList.toggle('active', tab === 'schedule');
+  if (tab === 'schedule') renderCalendar();
+}
+
+// ============================
+// Data fetching
+// ============================
+async function fetchServerStatus() {
+  try {
+    const resp = await fetch(DATA_URL + '?t=' + Date.now());
+    if (!resp.ok) throw new Error('fetch failed');
+    serverData = await resp.json();
+    // 실제 데이터인지 판별: 서버 배열이 비어있거나 last_updated가 초기값이면 데모
+    isDemo = !serverData.servers || serverData.servers.length === 0;
+    if (isDemo) {
+      serverData = getDemoData();
+    }
+    renderMonitor();
+    updateTimestamp();
+  } catch (e) {
+    console.warn('Failed to fetch server status, using demo data', e);
+    isDemo = true;
+    serverData = getDemoData();
+    renderMonitor();
+    updateTimestamp();
+  }
+}
+
+async function fetchSchedule() {
+  try {
+    const resp = await fetch(SCHEDULE_URL + '?t=' + Date.now());
+    if (!resp.ok) throw new Error('fetch failed');
+    scheduleData = await resp.json();
+  } catch (e) {
+    console.warn('Failed to fetch schedule, using demo data', e);
+    scheduleData = getDemoSchedule();
+  }
+  renderCalendar();
+}
+
+function updateTimestamp() {
+  if (!serverData) return;
+  const d = new Date(serverData.last_updated);
+  const timeStr = formatInTZ(d, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  document.getElementById('lastUpdated').textContent = `마지막 업데이트: ${timeStr} (${tzAbbr()})`;
+
+  const srcEl = document.getElementById('dataSource');
+  if (isDemo) {
+    srcEl.innerHTML = '<span style="color:var(--yellow);">⚠ 데모 데이터 — SSH 수집 연결 전</span>';
+    document.getElementById('liveIndicator').textContent = 'Demo';
+    document.getElementById('liveIndicator').style.color = 'var(--yellow)';
+  } else {
+    srcEl.innerHTML = '<span style="color:var(--green);">실시간 수집 중</span>';
+    document.getElementById('liveIndicator').textContent = 'Live';
+    document.getElementById('liveIndicator').style.color = 'var(--green)';
+  }
+}
+
+function startAutoRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => {
+    fetchServerStatus();
+    fetchSchedule();
+  }, REFRESH_INTERVAL);
+}
+
+// ============================
+// Monitor rendering
+// ============================
+function renderMonitor() {
+  if (!serverData) return;
+  const servers = serverData.servers;
+
+  // Summary bar
+  const online = servers.filter(s => s.status === 'online').length;
+  const offline = servers.length - online;
+  const totalGPU = servers.filter(s => s.type === 'gpu').reduce((sum, s) => sum + (s.gpu_count || 0), 0);
+  const usedGPU = servers.filter(s => s.type === 'gpu' && s.status === 'online')
+    .reduce((sum, s) => sum + (s.gpus || []).filter(g => g.utilization > 10).length, 0);
+
+  document.getElementById('summaryBar').innerHTML = `
+    <div class="summary-card">
+      <div class="sc-label">온라인 서버</div>
+      <div class="sc-value online">${online} <span style="font-size:14px;color:var(--text-dim)">/ ${servers.length}</span></div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">오프라인 서버</div>
+      <div class="sc-value ${offline > 0 ? 'offline' : ''}">${offline}</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">GPU 사용 현황</div>
+      <div class="sc-value">${usedGPU} <span style="font-size:14px;color:var(--text-dim)">/ ${totalGPU}</span></div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">접속 사용자</div>
+      <div class="sc-value">${[...new Set(servers.flatMap(s => s.users || []))].length}</div>
+    </div>
+  `;
+
+  // Server cards
+  document.getElementById('serversGrid').innerHTML = servers.map(s => renderServerCard(s)).join('');
+}
+
+function renderServerCard(s) {
+  const isGPU = s.type === 'gpu';
+  const isOnline = s.status === 'online';
+
+  let gpuHTML = '';
+  if (isGPU && isOnline && s.gpus && s.gpus.length) {
+    gpuHTML = '<div class="gpu-list">' + s.gpus.map((g, i) => {
+      const memPct = g.memory_total_mb > 0 ? (g.memory_used_mb / g.memory_total_mb * 100).toFixed(0) : 0;
+      return `
+        <div class="gpu-item">
+          <span class="gpu-label">GPU ${g.index}</span>
+          <div class="bar-container">
+            <div class="bar-fill gpu" style="width:${g.utilization}%"></div>
+            <span class="bar-text">${g.utilization}% · ${(g.memory_used_mb/1024).toFixed(1)}/${(g.memory_total_mb/1024).toFixed(0)}GB · ${g.temperature}°C</span>
+          </div>
+        </div>`;
+    }).join('') + '</div>';
+  }
+
+  const memPct = (s.memory && s.memory.percent) || 0;
+  const cpuPct = (s.cpu && s.cpu.usage_percent) || 0;
+
+  let sysHTML = '';
+  if (isOnline) {
+    sysHTML = `
+      <div class="gpu-item">
+        <span class="gpu-label">CPU</span>
+        <div class="bar-container">
+          <div class="bar-fill cpu-bar" style="width:${Math.min(cpuPct,100)}%"></div>
+          <span class="bar-text">${cpuPct}% · ${s.cpu.cores || '?'} cores · load ${s.cpu.load_avg || '?'}</span>
+        </div>
+      </div>
+      <div class="gpu-item">
+        <span class="gpu-label">RAM</span>
+        <div class="bar-container">
+          <div class="bar-fill mem" style="width:${Math.min(memPct,100)}%"></div>
+          <span class="bar-text">${memPct}% · ${((s.memory.used_mb||0)/1024).toFixed(1)}/${((s.memory.total_mb||0)/1024).toFixed(0)}GB</span>
+        </div>
+      </div>`;
+  }
+
+  let usersHTML = '';
+  if (isOnline && s.users && s.users.length) {
+    usersHTML = `<div class="users-section"><h4>접속 사용자</h4>${s.users.map(u => `<span class="user-tag">${u}</span>`).join('')}</div>`;
+  }
+
+  let processHTML = '';
+  if (isOnline && s.gpu_processes && s.gpu_processes.length) {
+    processHTML = `<div class="users-section"><h4>GPU 프로세스</h4><div class="process-list">${
+      s.gpu_processes.map(p => `<div class="process-item"><span>${p.name}</span><span>${(p.memory_mb/1024).toFixed(1)}GB</span></div>`).join('')
+    }</div></div>`;
+  }
+
+  const typeLabel = isGPU ? `GPU ${s.gpu_count}× ${s.gpu_memory_gb}GB` : 'CPU';
+  const typeClass = isGPU ? 'gpu' : 'cpu';
+
+  return `
+    <div class="server-card ${isOnline ? '' : 'offline'}">
+      <div class="card-header">
+        <div>
+          <h3>${s.name}</h3>
+          <span class="server-type ${typeClass}">${typeLabel}</span>
+        </div>
+        <span class="status-badge ${s.status}">${isOnline ? 'Online' : 'Offline'}</span>
+      </div>
+      ${gpuHTML}
+      ${sysHTML}
+      ${usersHTML}
+      ${processHTML}
+      ${isOnline && s.disk ? `
+      <div class="stats-row">
+        <div class="stat"><div class="stat-label">디스크</div><div class="stat-value">${s.disk.used} / ${s.disk.total}</div></div>
+        <div class="stat"><div class="stat-label">Host</div><div class="stat-value" style="font-size:11px">${s.host || '-'}</div></div>
+      </div>` : ''}
+    </div>`;
+}
+
+// ============================
+// Calendar rendering
+// ============================
+function renderCalendar() {
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  document.getElementById('calendarTitle').textContent = `${year}년 ${month + 1}월`;
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startDow = firstDay.getDay(); // 0=Sun
+  const totalDays = lastDay.getDate();
+
+  const todayStr = nowInTZ(); // timezone 기준 오늘 날짜
+
+  let html = ['일','월','화','수','목','금','토'].map(d => `<div class="cal-header-cell">${d}</div>`).join('');
+
+  // 이전 달 빈 셀
+  const prevLast = new Date(year, month, 0).getDate();
+  for (let i = startDow - 1; i >= 0; i--) {
+    const d = prevLast - i;
+    html += `<div class="cal-cell other-month"><span class="day-num">${d}</span></div>`;
+  }
+
+  // 현재 달
+  for (let d = 1; d <= totalDays; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dateStr === todayStr;
+    const events = getEventsForDate(dateStr);
+    const evHTML = events.slice(0, 3).map(ev => {
+      const cls = SERVER_COLORS[ev.server] || 'cpu-srv';
+      return `<div class="cal-event ${cls}" title="${ev.user}: ${ev.server} ${ev.start_time}-${ev.end_time}">${ev.user} · ${ev.server}</div>`;
+    }).join('') + (events.length > 3 ? `<div style="font-size:10px;color:var(--text-dim)">+${events.length-3}개 더</div>` : '');
+
+    html += `<div class="cal-cell ${isToday ? 'today' : ''}" onclick="selectDate('${dateStr}')">
+      <span class="day-num">${d}</span>
+      ${evHTML}
+    </div>`;
+  }
+
+  // 다음 달 빈 셀
+  const remaining = 7 - ((startDow + totalDays) % 7);
+  if (remaining < 7) {
+    for (let d = 1; d <= remaining; d++) {
+      html += `<div class="cal-cell other-month"><span class="day-num">${d}</span></div>`;
+    }
+  }
+
+  document.getElementById('calendarGrid').innerHTML = html;
+}
+
+function getEventsForDate(dateStr) {
+  return (scheduleData || []).filter(ev => ev.date === dateStr);
+}
+
+function selectDate(dateStr) {
+  selectedDate = dateStr;
+  const events = getEventsForDate(dateStr);
+  const d = new Date(dateStr + 'T00:00:00');
+  const title = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+
+  document.getElementById('detailTitle').textContent = title;
+
+  if (events.length === 0) {
+    document.getElementById('detailContent').innerHTML = `<p style="color:var(--text-dim);font-size:13px;">이 날에 등록된 예약이 없습니다.</p>`;
+  } else {
+    document.getElementById('detailContent').innerHTML = events.map(ev => {
+      const gpuInfo = ev.gpus ? `<div class="ev-time">GPU: ${ev.gpus.join(', ')}</div>` : '';
+      return `
+        <div class="event-detail">
+          <div class="ev-server">${ev.server}</div>
+          <div class="ev-user">${ev.user}</div>
+          <div class="ev-time">${ev.start_time} ~ ${ev.end_time}</div>
+          ${gpuInfo}
+          ${ev.note ? `<div class="ev-note">${ev.note}</div>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  // Show add form with timezone label
+  document.getElementById('addForm').style.display = 'block';
+  document.getElementById('formTzLabel').textContent = `(${tzAbbr()})`;
+}
+
+function changeMonth(delta) {
+  currentMonth.setMonth(currentMonth.getMonth() + delta);
+  renderCalendar();
+}
+
+function goToday() {
+  currentMonth = new Date();
+  renderCalendar();
+  selectDate(nowInTZ());
+}
+
+// ============================
+// Schedule form
+// ============================
+document.getElementById('formServer').addEventListener('change', function() {
+  document.getElementById('gpuSelectRow').style.display = this.value === 'ISPL' ? 'block' : 'none';
+});
+
+function submitSchedule() {
+  const user = document.getElementById('formUser').value.trim();
+  const server = document.getElementById('formServer').value;
+  const start = document.getElementById('formStart').value;
+  const end = document.getElementById('formEnd').value;
+  const note = document.getElementById('formNote').value.trim();
+
+  if (!user || !selectedDate) {
+    alert('이름과 날짜를 선택해주세요.');
+    return;
+  }
+
+  const newEvent = {
+    date: selectedDate,
+    user: user,
+    server: server,
+    start_time: start,
+    end_time: end,
+    timezone: currentTimezone,
+    note: note || ''
+  };
+
+  if (server === 'ISPL') {
+    const gpuSelect = document.getElementById('formGPU');
+    const selectedGPUs = Array.from(gpuSelect.selectedOptions).map(o => parseInt(o.value));
+    if (selectedGPUs.length > 0) newEvent.gpus = selectedGPUs;
+  }
+
+  scheduleData.push(newEvent);
+
+  // 안내: 실제 운영 시에는 GitHub API를 통해 커밋하거나 Issues에 등록
+  const jsonStr = JSON.stringify(newEvent, null, 2);
+  const instructions = `
+예약이 로컬에 추가되었습니다.
+
+실제로 저장하려면 다음 중 하나를 수행하세요:
+
+1. data/schedule.json 파일에 아래 내용을 추가하고 커밋:
+${jsonStr}
+
+2. 또는 GitHub Issue로 등록:
+   제목: [Schedule] ${user} - ${server} (${selectedDate})
+   본문: 위 JSON 내용
+  `;
+
+  alert(instructions);
+  renderCalendar();
+  selectDate(selectedDate);
+  cancelForm();
+}
+
+function cancelForm() {
+  document.getElementById('addForm').style.display = 'none';
+  document.getElementById('formUser').value = '';
+  document.getElementById('formNote').value = '';
+}
+
+// ============================
+// Demo data (GitHub Pages 배포 전 테스트용)
+// ============================
+function getDemoData() {
+  return {
+    last_updated: new Date().toISOString(),
+    servers: [
+      {
+        name: "NIPA_server", type: "gpu", status: "online",
+        timestamp: new Date().toISOString(), host: "-",
+        gpu_count: 1, gpu_memory_gb: 80,
+        gpus: [{ index: 0, name: "NVIDIA A100 80GB", utilization: 73, memory_used_mb: 54272, memory_total_mb: 81920, temperature: 62 }],
+        cpu: { cores: 32, load_avg: 4.2, usage_percent: 28.5 },
+        memory: { used_mb: 45056, total_mb: 131072, percent: 34.4 },
+        disk: { used: "1.2T", total: "3.6T", percent: 33 },
+        users: ["ispl", "dongho"],
+        gpu_processes: [{ pid: 12345, name: "python train.py", memory_mb: 51200 }]
+      },
+      {
+        name: "ISPL", type: "gpu", status: "online",
+        timestamp: new Date().toISOString(), host: "-",
+        gpu_count: 8, gpu_memory_gb: 48,
+        gpus: [
+          { index: 0, name: "NVIDIA RTX A6000", utilization: 95, memory_used_mb: 44032, memory_total_mb: 49152, temperature: 71 },
+          { index: 1, name: "NVIDIA RTX A6000", utilization: 88, memory_used_mb: 40960, memory_total_mb: 49152, temperature: 68 },
+          { index: 2, name: "NVIDIA RTX A6000", utilization: 0, memory_used_mb: 512, memory_total_mb: 49152, temperature: 35 },
+          { index: 3, name: "NVIDIA RTX A6000", utilization: 45, memory_used_mb: 24576, memory_total_mb: 49152, temperature: 55 },
+          { index: 4, name: "NVIDIA RTX A6000", utilization: 0, memory_used_mb: 512, memory_total_mb: 49152, temperature: 34 },
+          { index: 5, name: "NVIDIA RTX A6000", utilization: 0, memory_used_mb: 512, memory_total_mb: 49152, temperature: 33 },
+          { index: 6, name: "NVIDIA RTX A6000", utilization: 67, memory_used_mb: 32768, memory_total_mb: 49152, temperature: 60 },
+          { index: 7, name: "NVIDIA RTX A6000", utilization: 0, memory_used_mb: 512, memory_total_mb: 49152, temperature: 34 }
+        ],
+        cpu: { cores: 64, load_avg: 12.5, usage_percent: 42.1 },
+        memory: { used_mb: 98304, total_mb: 262144, percent: 37.5 },
+        disk: { used: "5.2T", total: "14T", percent: 37 },
+        users: ["ispl", "student1", "student2"],
+        gpu_processes: [
+          { pid: 23456, name: "python train_3dgs.py", memory_mb: 43520 },
+          { pid: 23457, name: "python eval.py", memory_mb: 40448 },
+          { pid: 23458, name: "python finetune.py", memory_mb: 24064 },
+          { pid: 23459, name: "python render.py", memory_mb: 32256 }
+        ]
+      },
+      {
+        name: "CPU1", type: "cpu", status: "online",
+        timestamp: new Date().toISOString(), host: "-",
+        cpu: { cores: 16, load_avg: 2.1, usage_percent: 15.3 },
+        memory: { used_mb: 8192, total_mb: 32768, percent: 25.0 },
+        disk: { used: "120G", total: "500G", percent: 24 },
+        users: ["user"]
+      },
+      {
+        name: "CPU2", type: "cpu", status: "online",
+        timestamp: new Date().toISOString(), host: "-",
+        cpu: { cores: 16, load_avg: 0.5, usage_percent: 3.2 },
+        memory: { used_mb: 4096, total_mb: 32768, percent: 12.5 },
+        disk: { used: "80G", total: "500G", percent: 16 },
+        users: []
+      },
+      {
+        name: "CPU3", type: "cpu", status: "offline",
+        timestamp: new Date().toISOString(), host: "-",
+        cpu: {}, memory: {}, disk: {}, users: []
+      },
+      {
+        name: "CPU4", type: "cpu", status: "online",
+        timestamp: new Date().toISOString(), host: "-",
+        cpu: { cores: 8, load_avg: 1.0, usage_percent: 8.7 },
+        memory: { used_mb: 6144, total_mb: 16384, percent: 37.5 },
+        disk: { used: "200G", total: "1.0T", percent: 20 },
+        users: ["user"]
+      }
+    ]
+  };
+}
+
+function getDemoSchedule() {
+  const today = new Date();
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+  const dayAfter = new Date(today); dayAfter.setDate(today.getDate()+2);
+
+  return [
+    { date: fmt(today), user: "동호", server: "NIPA_server", start_time: "09:00", end_time: "18:00", note: "3DGS anti-aliasing 실험" },
+    { date: fmt(today), user: "민수", server: "ISPL", start_time: "10:00", end_time: "22:00", gpus: [0, 1], note: "NeRF training" },
+    { date: fmt(today), user: "지현", server: "ISPL", start_time: "14:00", end_time: "20:00", gpus: [3, 6], note: "Evaluation" },
+    { date: fmt(tomorrow), user: "동호", server: "ISPL", start_time: "09:00", end_time: "23:00", gpus: [0, 1, 2, 3], note: "Multi-GPU training" },
+    { date: fmt(tomorrow), user: "수진", server: "CPU1", start_time: "10:00", end_time: "17:00", note: "데이터 전처리" },
+    { date: fmt(dayAfter), user: "민수", server: "NIPA_server", start_time: "00:00", end_time: "23:59", note: "Long training run" }
+  ];
+}
+
+// ============================
+// Init
+// ============================
+(async function init() {
+  // Timezone selector 초기화
+  const tzSelect = document.getElementById('timezoneSelect');
+  tzSelect.value = currentTimezone;
+  tzSelect.addEventListener('change', function() {
+    currentTimezone = this.value;
+    try { localStorage.setItem('tz', currentTimezone); } catch(e) {}
+    // 전체 UI 갱신
+    updateTimestamp();
+    renderCalendar();
+    if (selectedDate) selectDate(selectedDate);
+  });
+
+  await Promise.all([fetchServerStatus(), fetchSchedule()]);
+  startAutoRefresh();
+  // GPU select visibility
+  document.getElementById('gpuSelectRow').style.display = 'none';
+})();
+
+// ===== Login System =====
+// Password is SHA-256 hashed for basic protection
+// Default password: "***REMOVED***" (change this hash when you change the password)
+const PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // "password" - CHANGE THIS
+
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function doLogin() {
+  const pwd = document.getElementById('loginPassword').value;
+  const hash = await sha256(pwd);
+  // Check against stored hash OR plaintext match for convenience
+  if (hash === PASSWORD_HASH || pwd === '***REMOVED***') {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('dashboardContent').classList.add('unlocked');
+    sessionStorage.setItem('ispl_dash_auth', 'true');
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginPassword').value = '';
+    setTimeout(() => { document.getElementById('loginError').style.display = 'none'; }, 2000);
+  }
+}
+
+// Auto-login if already authenticated in this session
+if (sessionStorage.getItem('ispl_dash_auth') === 'true') {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('dashboardContent').classList.add('unlocked');
+}
+</script>
+</div><!-- end dashboard-content -->
+</body>
+</html>

@@ -1,0 +1,89 @@
+name: Manage Schedule via Issues
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  add-schedule:
+    if: startsWith(github.event.issue.title, '[Schedule]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse issue and update schedule
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+
+            // Issue body에서 JSON 파싱 시도
+            let event;
+            try {
+              // ```json ... ``` 블록에서 추출
+              const jsonMatch = body.match(/```json\s*([\s\S]*?)\s*```/) || body.match(/\{[\s\S]*\}/);
+              const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : body;
+              event = JSON.parse(jsonStr);
+            } catch (e) {
+              // 폼 형식 파싱 (key: value)
+              const lines = body.split('\n').filter(l => l.includes(':'));
+              event = {};
+              for (const line of lines) {
+                const [key, ...vals] = line.split(':');
+                const k = key.trim().toLowerCase().replace(/\s+/g, '_');
+                const v = vals.join(':').trim();
+                if (k === 'gpus') {
+                  event[k] = v.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+                } else {
+                  event[k] = v;
+                }
+              }
+            }
+
+            // 필수 필드 검증
+            if (!event.date || !event.user || !event.server) {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: issue.number,
+                body: '❌ 필수 필드가 누락되었습니다. date, user, server는 반드시 입력해주세요.\n\n예시:\n```json\n{"date":"2026-04-10","user":"동호","server":"NIPA_server","start_time":"09:00","end_time":"18:00","note":"실험"}\n```'
+              });
+              return;
+            }
+
+            // schedule.json 읽기
+            const fs = require('fs');
+            const schedulePath = 'data/schedule.json';
+            let schedule = [];
+            try {
+              schedule = JSON.parse(fs.readFileSync(schedulePath, 'utf8'));
+            } catch (e) {}
+
+            schedule.push(event);
+            fs.writeFileSync(schedulePath, JSON.stringify(schedule, null, 2));
+
+            // 커밋
+            const { execSync } = require('child_process');
+            execSync('git config user.name "Schedule Bot"');
+            execSync('git config user.email "schedule@github.com"');
+            execSync(`git add ${schedulePath}`);
+            execSync(`git commit -m "Add schedule: ${event.user} - ${event.server} (${event.date})"`);
+            execSync('git push');
+
+            // Issue에 확인 코멘트
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: issue.number,
+              body: `✅ 예약이 등록되었습니다!\n\n| 항목 | 내용 |\n|------|------|\n| 날짜 | ${event.date} |\n| 사용자 | ${event.user} |\n| 서버 | ${event.server} |\n| 시간 | ${event.start_time || '-'} ~ ${event.end_time || '-'} |\n| GPU | ${event.gpus ? event.gpus.join(', ') : '전체/해당없음'} |\n| 메모 | ${event.note || '-'} |`
+            });
+
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: issue.number,
+              state: 'closed',
+              labels: ['schedule']
+            });

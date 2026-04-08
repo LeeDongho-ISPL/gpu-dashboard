@@ -1,0 +1,9 @@
+# 서버 IP 설정 파일 (보안)
+scripts/servers.conf
+
+# 로그 파일
+logs/
+
+# OS
+.DS_Store
+Thumbs.db

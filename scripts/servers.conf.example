@@ -1,0 +1,28 @@
+# servers.conf - 서버 IP/포트/유저 설정
+# 이 파일을 servers.conf로 복사한 뒤 실제 값을 입력하세요.
+# servers.conf는 .gitignore에 의해 커밋되지 않습니다.
+
+# NIPA (Jump Host / 외부 GPU 서버)
+NIPA_IP=YOUR_NIPA_IP
+NIPA_PORT=22
+NIPA_USER=ispl
+
+# ISPL (내부망 GPU 서버)
+ISPL_IP=YOUR_ISPL_IP
+ISPL_PORT=15422
+ISPL_USER=ispl
+
+# CPU 서버들 (내부망)
+CPU1_IP=YOUR_CPU1_IP
+CPU1_PORT=15422
+
+CPU2_IP=YOUR_CPU2_IP
+CPU2_PORT=15422
+
+CPU3_IP=YOUR_CPU3_IP
+CPU3_PORT=15422
+
+CPU4_IP=YOUR_CPU4_IP
+CPU4_PORT=15422
+
+CPU_USER=user

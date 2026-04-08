@@ -1,0 +1,3 @@
+cd C:\Users\ISPL\Desktop\gpu-dashboard
+git config --global user.name "LeeDongho-ISPL"
+git config --global user.email "your-email@example.com"
