@@ -561,6 +561,11 @@ async function fetchSchedule() {
       ev.date = normalizeDate(ev.date);
       ev.start_time = normalizeTime(ev.start_time);
       ev.end_time = normalizeTime(ev.end_time);
+      // timestamp 빈 키 복구: Apps Script가 헤더를 동적으로 읽을 때 빈 키가 생길 수 있음
+      if (!ev.timestamp && ev[''] !== undefined) {
+        ev.timestamp = ev[''];
+        delete ev[''];
+      }
       // gpus: "0,1,2" 문자열 → 배열 변환
       if (ev.gpus && typeof ev.gpus === 'string' && ev.gpus.length > 0) {
         ev.gpus = ev.gpus.split(',').map(g => parseInt(g.trim()));
