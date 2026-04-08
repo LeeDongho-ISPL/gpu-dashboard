@@ -606,8 +606,8 @@ function renderServerCard(s) {
         <div class="gpu-item">
           <span class="gpu-label">GPU ${g.index}</span>
           <div class="bar-container">
-            <div class="bar-fill gpu" style="width:${g.utilization}%"></div>
-            <span class="bar-text">${g.utilization}% · ${(g.memory_used_mb/1024).toFixed(1)}/${(g.memory_total_mb/1024).toFixed(0)}GB · ${g.temperature}°C</span>
+            <div class="bar-fill gpu" style="width:${memPct}%"></div>
+            <span class="bar-text">${memPct}% · ${(g.memory_used_mb/1024).toFixed(1)}/${(g.memory_total_mb/1024).toFixed(0)}GB · ${g.temperature}°C</span>
           </div>
         </div>`;
     }).join('') + '</div>';
