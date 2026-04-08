@@ -519,12 +519,49 @@ async function fetchServerStatus() {
   }
 }
 
+function normalizeDate(val) {
+  if (!val) return '';
+  const s = String(val);
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // ISO datetime string like "2026-04-08T15:00:00.000Z"
+  if (s.includes('T')) {
+    const d = new Date(s);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  // Date string without time
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  return s;
+}
+
+function normalizeTime(val) {
+  if (!val) return '';
+  const s = String(val);
+  // Already HH:MM
+  if (/^\d{1,2}:\d{2}$/.test(s)) return s;
+  // Date object serialized as ISO string
+  if (s.includes('T') || s.includes(':')) {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) {
+      return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    }
+  }
+  return s;
+}
+
 async function fetchSchedule() {
   try {
     const resp = await fetch(SCHEDULE_URL + '?t=' + Date.now());
     const data = await resp.json();
-    // Google Sheets에서 gpus가 "0,1,2" 문자열로 올 수 있으므로 배열로 변환
     scheduleData = data.map(ev => {
+      // Google Sheets 자동 변환 대응: date, time 필드 정규화
+      ev.date = normalizeDate(ev.date);
+      ev.start_time = normalizeTime(ev.start_time);
+      ev.end_time = normalizeTime(ev.end_time);
+      // gpus: "0,1,2" 문자열 → 배열 변환
       if (ev.gpus && typeof ev.gpus === 'string' && ev.gpus.length > 0) {
         ev.gpus = ev.gpus.split(',').map(g => parseInt(g.trim()));
       }
