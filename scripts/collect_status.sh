@@ -262,10 +262,10 @@ NIPA_JSON=$(collect_gpu_server "NIPA_server" "$NIPA_IP" "$NIPA_PORT" "$NIPA_USER
 ISPL_JSON=$(collect_gpu_server "ISPL" "$ISPL_IP" "$ISPL_PORT" "$ISPL_USER" 8 48)
 
 # CPU Servers
-CPU1_JSON=$(collect_cpu_server "CPU1" "$CPU1_IP" "$CPU1_PORT" "$CPU_USER")
-CPU2_JSON=$(collect_cpu_server "CPU2" "$CPU2_IP" "$CPU2_PORT" "$CPU_USER")
-CPU3_JSON=$(collect_cpu_server "CPU3" "$CPU3_IP" "$CPU3_PORT" "$CPU_USER")
-CPU4_JSON=$(collect_cpu_server "CPU4" "$CPU4_IP" "$CPU4_PORT" "$CPU_USER")
+CPU1_JSON=$(collect_cpu_server "CPU1" "$CPU1_IP" "$CPU_PORT" "$CPU_USER")
+CPU2_JSON=$(collect_cpu_server "CPU2" "$CPU2_IP" "$CPU_PORT" "$CPU_USER")
+CPU3_JSON=$(collect_cpu_server "CPU3" "$CPU3_IP" "$CPU_PORT" "$CPU_USER")
+CPU4_JSON=$(collect_cpu_server "CPU4" "$CPU4_IP" "$CPU_PORT" "$CPU_USER")
 
 # 전체 JSON 조합
 mkdir -p "$OUTPUT_DIR"
