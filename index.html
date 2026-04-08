@@ -437,7 +437,7 @@ body {
 // Config
 // ============================
 const DATA_URL = 'data/server_status.json';
-const SCHEDULE_URL = 'data/schedule.json';
+const SCHEDULE_URL = 'https://script.google.com/macros/s/AKfycbwXCBYqdz1-_F4AvMz3iFKtLRoE8TybccDfYJKPxbuX1V9Do1PNLPjZ7CfjpkSZW-y8Vg/exec';
 const REFRESH_INTERVAL = 5 * 60 * 1000; // 5분
 
 const SERVER_COLORS = {
@@ -522,8 +522,14 @@ async function fetchServerStatus() {
 async function fetchSchedule() {
   try {
     const resp = await fetch(SCHEDULE_URL + '?t=' + Date.now());
-    if (!resp.ok) throw new Error('fetch failed');
-    scheduleData = await resp.json();
+    const data = await resp.json();
+    // Google Sheets에서 gpus가 "0,1,2" 문자열로 올 수 있으므로 배열로 변환
+    scheduleData = data.map(ev => {
+      if (ev.gpus && typeof ev.gpus === 'string' && ev.gpus.length > 0) {
+        ev.gpus = ev.gpus.split(',').map(g => parseInt(g.trim()));
+      }
+      return ev;
+    });
   } catch (e) {
     console.warn('Failed to fetch schedule, using demo data', e);
     scheduleData = getDemoSchedule();
@@ -813,7 +819,7 @@ document.querySelectorAll('#gpuCheckboxGrid .gpu-checkbox-item').forEach(item =>
   });
 });
 
-function submitSchedule() {
+async function submitSchedule() {
   const user = document.getElementById('formUser').value.trim();
   const server = document.getElementById('formServer').value;
   const start = document.getElementById('formStart').value;
@@ -826,6 +832,7 @@ function submitSchedule() {
   }
 
   const newEvent = {
+    action: 'add',
     date: selectedDate,
     user: user,
     server: server,
@@ -837,30 +844,26 @@ function submitSchedule() {
 
   if (server === 'ISPL') {
     const selectedGPUs = getSelectedGPUs();
-    if (selectedGPUs.length > 0) newEvent.gpus = selectedGPUs;
+    if (selectedGPUs.length > 0) newEvent.gpus = selectedGPUs.join(',');
   }
 
-  scheduleData.push(newEvent);
-
-  // 안내: 실제 운영 시에는 GitHub API를 통해 커밋하거나 Issues에 등록
-  const jsonStr = JSON.stringify(newEvent, null, 2);
-  const instructions = `
-예약이 로컬에 추가되었습니다.
-
-실제로 저장하려면 다음 중 하나를 수행하세요:
-
-1. data/schedule.json 파일에 아래 내용을 추가하고 커밋:
-${jsonStr}
-
-2. 또는 GitHub Issue로 등록:
-   제목: [Schedule] ${user} - ${server} (${selectedDate})
-   본문: 위 JSON 내용
-  `;
-
-  alert(instructions);
-  renderCalendar();
-  selectDate(selectedDate);
-  cancelForm();
+  try {
+    const resp = await fetch(SCHEDULE_URL, {
+      method: 'POST',
+      body: JSON.stringify(newEvent)
+    });
+    const result = await resp.json();
+    if (result.status === 'ok') {
+      alert('예약이 등록되었습니다!');
+      await fetchSchedule();
+      if (selectedDate) selectDate(selectedDate);
+      cancelForm();
+    } else {
+      alert('예약 등록 실패: ' + (result.message || ''));
+    }
+  } catch (e) {
+    alert('서버 연결 실패: ' + e.message);
+  }
 }
 
 function cancelForm() {
@@ -869,19 +872,35 @@ function cancelForm() {
   document.getElementById('formNote').value = '';
 }
 
-function deleteSchedule(index) {
+async function deleteSchedule(index) {
   const ev = scheduleData[index];
   if (!ev) return;
 
   const msg = `${ev.user}님의 ${ev.server} 예약 (${ev.start_time}~${ev.end_time})을 취소하시겠습니까?`;
   if (!confirm(msg)) return;
 
-  scheduleData.splice(index, 1);
-
-  const jsonStr = JSON.stringify(scheduleData, null, 2);
-  alert(`예약이 취소되었습니다.\n\n실제로 반영하려면 data/schedule.json을 업데이트하고 커밋하세요.`);
-  renderCalendar();
-  if (selectedDate) selectDate(selectedDate);
+  try {
+    const resp = await fetch(SCHEDULE_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'delete',
+        date: ev.date,
+        user: ev.user,
+        server: ev.server,
+        timestamp: ev.timestamp || ''
+      })
+    });
+    const result = await resp.json();
+    if (result.status === 'ok') {
+      alert('예약이 취소되었습니다.');
+      await fetchSchedule();
+      if (selectedDate) selectDate(selectedDate);
+    } else {
+      alert('취소 실패: ' + (result.message || ''));
+    }
+  } catch (e) {
+    alert('서버 연결 실패: ' + e.message);
+  }
 }
 
 // ============================
@@ -985,52 +1004,4 @@ function getDemoSchedule() {
   tzSelect.value = currentTimezone;
   tzSelect.addEventListener('change', function() {
     currentTimezone = this.value;
-    try { localStorage.setItem('tz', currentTimezone); } catch(e) {}
-    // 전체 UI 갱신
-    updateTimestamp();
-    renderCalendar();
-    if (selectedDate) selectDate(selectedDate);
-  });
-
-  await Promise.all([fetchServerStatus(), fetchSchedule()]);
-  startAutoRefresh();
-  // GPU select visibility
-  document.getElementById('gpuSelectRow').style.display = 'none';
-})();
-
-// ===== Login System =====
-// Password is SHA-256 hashed for basic protection
-// Default password: "***REMOVED***" (change this hash when you change the password)
-const PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // "password" - CHANGE THIS
-
-async function sha256(message) {
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function doLogin() {
-  const pwd = document.getElementById('loginPassword').value;
-  const hash = await sha256(pwd);
-  // Check against stored hash OR plaintext match for convenience
-  if (hash === PASSWORD_HASH || pwd === '***REMOVED***') {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('dashboardContent').classList.add('unlocked');
-    sessionStorage.setItem('ispl_dash_auth', 'true');
-  } else {
-    document.getElementById('loginError').style.display = 'block';
-    document.getElementById('loginPassword').value = '';
-    setTimeout(() => { document.getElementById('loginError').style.display = 'none'; }, 2000);
-  }
-}
-
-// Auto-login if already authenticated in this session
-if (sessionStorage.getItem('ispl_dash_auth') === 'true') {
-  document.getElementById('loginOverlay').style.display = 'none';
-  document.getElementById('dashboardContent').classList.add('unlocked');
-}
-</script>
-</div><!-- end dashboard-content -->
-</body>
-</html>
+    try { localStorage.setItem('tz', cur
