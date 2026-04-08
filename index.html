@@ -1061,8 +1061,8 @@ function getDemoSchedule() {
 
 // ===== Login System =====
 // Password is SHA-256 hashed for basic protection
-// Default password: "***REMOVED***" (change this hash when you change the password)
-const PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // "password" - CHANGE THIS
+// Password is verified via SHA-256 hash only (no plaintext stored in source)
+const PASSWORD_HASH = 'b3b5eee0b5d012744940d913e2d72b2b833a5e3e2a1e3c55f9ad77a0788b5841';
 
 async function sha256(message) {
   const msgBuffer = new TextEncoder().encode(message);
@@ -1074,8 +1074,7 @@ async function sha256(message) {
 async function doLogin() {
   const pwd = document.getElementById('loginPassword').value;
   const hash = await sha256(pwd);
-  // Check against stored hash OR plaintext match for convenience
-  if (hash === PASSWORD_HASH || pwd === '***REMOVED***') {
+  if (hash === PASSWORD_HASH) {
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('dashboardContent').classList.add('unlocked');
     sessionStorage.setItem('ispl_dash_auth', 'true');
