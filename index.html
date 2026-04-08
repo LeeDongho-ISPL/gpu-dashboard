@@ -1004,4 +1004,52 @@ function getDemoSchedule() {
   tzSelect.value = currentTimezone;
   tzSelect.addEventListener('change', function() {
     currentTimezone = this.value;
-    try { localStorage.setItem('tz', cur
+    try { localStorage.setItem('tz', currentTimezone); } catch(e) {}
+    // 전체 UI 갱신
+    updateTimestamp();
+    renderCalendar();
+    if (selectedDate) selectDate(selectedDate);
+  });
+
+  await Promise.all([fetchServerStatus(), fetchSchedule()]);
+  startAutoRefresh();
+  // GPU select visibility
+  document.getElementById('gpuSelectRow').style.display = 'none';
+})();
+
+// ===== Login System =====
+// Password is SHA-256 hashed for basic protection
+// Default password: "***REMOVED***" (change this hash when you change the password)
+const PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // "password" - CHANGE THIS
+
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function doLogin() {
+  const pwd = document.getElementById('loginPassword').value;
+  const hash = await sha256(pwd);
+  // Check against stored hash OR plaintext match for convenience
+  if (hash === PASSWORD_HASH || pwd === '***REMOVED***') {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('dashboardContent').classList.add('unlocked');
+    sessionStorage.setItem('ispl_dash_auth', 'true');
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginPassword').value = '';
+    setTimeout(() => { document.getElementById('loginError').style.display = 'none'; }, 2000);
+  }
+}
+
+// Auto-login if already authenticated in this session
+if (sessionStorage.getItem('ispl_dash_auth') === 'true') {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('dashboardContent').classList.add('unlocked');
+}
+</script>
+</div><!-- end dashboard-content -->
+</body>
+</html>
