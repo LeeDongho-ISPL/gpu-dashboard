@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISPL Server Dashboard — GPU 가용현황 프로토타입 v2</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --card: #1a1d2e;
+  --card-hover: #222640;
+  --border: #2a2e45;
+  --text: #e1e4ed;
+  --text-dim: #8b8fa3;
+  --accent: #6c7aff;
+  --accent-light: #8b96ff;
+  --green: #34d399;
+  --red: #f87171;
+  --yellow: #fbbf24;
+  --orange: #fb923c;
+  --gpu-bar: linear-gradient(90deg, #6c7aff, #a78bfa);
+  --mem-bar: linear-gradient(90deg, #34d399, #6ee7b7);
+  --cpu-bar: linear-gradient(90deg, #fbbf24, #fcd34d);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+}
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+}
+.header h1 { font-size: 24px; font-weight: 700; }
+.header h1 span { color: var(--accent); }
+.header-meta { text-align: right; color: var(--text-dim); font-size: 13px; }
+.header-meta .live { color: var(--green); font-weight: 600; }
+.header-meta .live::before { content: '●'; margin-right: 4px; animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; background: var(--card); border-radius: 10px; padding: 4px; width: fit-content; }
+.tab {
+  padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--text-dim); transition: all 0.2s; border: none; background: none;
+}
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--accent); color: #fff; }
+
+/* Sections */
+.schedule-section { display: none; }
+.schedule-section.active { display: block; }
+.monitor-section { display: none; }
+.monitor-section.active { display: block; }
+
+/* Server Cards (Monitor) */
+.servers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; }
+.server-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; transition: all 0.2s;
+}
+.server-card:hover { border-color: var(--accent); background: var(--card-hover); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.card-header h3 { font-size: 18px; font-weight: 600; }
+.server-type { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; text-transform: uppercase; }
+.server-type.gpu { background: rgba(108,122,255,0.15); color: var(--accent-light); }
+.status-badge { font-size: 12px; font-weight: 600; }
+.status-badge.online { color: var(--green); }
+.status-badge.online::before { content: '● '; }
+.gpu-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.gpu-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.gpu-label { width: 55px; color: var(--text-dim); font-size: 12px; flex-shrink: 0; }
+.bar-container { flex: 1; height: 22px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; min-width: 2px; }
+.bar-fill.gpu { background: var(--gpu-bar); }
+.bar-fill.mem { background: var(--mem-bar); }
+.bar-fill.cpu-bar { background: var(--cpu-bar); }
+.bar-text {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font-size: 11px; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.summary-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.summary-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 20px; flex: 1; min-width: 150px;
+}
+.summary-card .sc-label { font-size: 12px; color: var(--text-dim); }
+.summary-card .sc-value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+.summary-card .sc-value.online { color: var(--green); }
+
+/* ============================================================ */
+/* Schedule Tab — NEW LAYOUT                                     */
+/* GPU Timeline (top) → Calendar (bottom-left) + Detail (right) */
+/* ============================================================ */
+
+/* Main layout: left (timeline + calendar) + right (detail panel) */
+.schedule-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.schedule-main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Detail Panel (right) */
+.detail-panel {
+  width: 380px; min-width: 380px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+  position: sticky; top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+.detail-panel h3 { font-size: 16px; margin-bottom: 16px; }
+
+.event-detail {
+  background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px; margin-bottom: 8px;
+  border-left: 3px solid var(--accent);
+}
+.event-detail .ev-server { font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
+.event-detail .ev-user { font-size: 14px; font-weight: 600; }
+.event-detail .ev-time { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.event-detail .ev-note { font-size: 12px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
+.event-detail .ev-delete {
+  margin-top: 8px; padding: 4px 12px; font-size: 11px; font-weight: 600;
+  background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.event-detail .ev-delete:hover { background: rgba(239,68,68,0.25); }
+
+/* Add Form */
+.add-form {
+  border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px;
+}
+.add-form h3 { font-size: 15px; margin-bottom: 14px; }
+.form-row { margin-bottom: 10px; }
+.form-row label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+.form-row input, .form-row select, .form-row textarea {
+  width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  font-size: 14px; font-family: inherit;
+}
+.form-row input:focus, .form-row select:focus { outline: none; border-color: var(--accent); }
+.form-row textarea { resize: vertical; min-height: 50px; }
+.btn-submit {
+  background: var(--accent); color: #fff; border: none; padding: 10px 24px;
+  border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;
+}
+.btn-submit:hover { background: var(--accent-light); }
+.btn-cancel {
+  background: none; color: var(--text-dim); border: 1px solid var(--border);
+  padding: 10px 24px; border-radius: 8px; font-size: 14px; cursor: pointer;
+  width: 100%; margin-top: 8px;
+}
+
+.gpu-checkbox-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.gpu-checkbox-item {
+  display: flex; align-items: center; justify-content: center;
+  padding: 8px 4px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+  font-size: 13px; font-weight: 500; transition: all 0.15s; user-select: none;
+}
+.gpu-checkbox-item:hover { border-color: var(--accent); }
+.gpu-checkbox-item.checked { border-color: var(--accent); background: rgba(108,122,255,0.15); color: var(--accent-light); }
+.gpu-checkbox-item input[type="checkbox"] { display: none; }
+
+/* Calendar */
+.calendar-section {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px;
+}
+.calendar-nav { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.calendar-nav button {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text);
+  padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px;
+}
+.calendar-nav button:hover { border-color: var(--accent); }
+.calendar-nav h2 { font-size: 20px; }
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+  border-radius: 10px; overflow: hidden;
+}
+.cal-header-cell {
+  padding: 10px; text-align: center; font-size: 12px; font-weight: 600;
+  color: var(--text-dim); background: rgba(255,255,255,0.03);
+}
+.cal-cell {
+  min-height: 85px; padding: 6px 8px; background: rgba(255,255,255,0.01); cursor: pointer;
+  border: 1px solid transparent; transition: all 0.15s; position: relative;
+}
+.cal-cell:hover { background: var(--card-hover); border-color: var(--accent); }
+.cal-cell.other-month { opacity: 0.3; }
+.cal-cell.today { border-color: var(--accent); background: rgba(108,122,255,0.05); }
+.cal-cell.selected { border-color: var(--accent); background: rgba(108,122,255,0.08); }
+.cal-cell .day-num { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.cal-cell.today .day-num { color: var(--accent); }
+.cal-event {
+  font-size: 10px; padding: 2px 5px; border-radius: 4px; margin-bottom: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+}
+.cal-event.nipa { background: rgba(108,122,255,0.2); color: var(--accent-light); }
+.cal-event.ispl-srv { background: rgba(52,211,153,0.2); color: var(--green); }
+.cal-event.cpu-srv { background: rgba(251,191,36,0.2); color: var(--yellow); }
+
+/* ============================================================ */
+/* GPU Availability Timeline Section                             */
+/* ============================================================ */
+.gpu-avail-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.gpu-avail-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.gpu-avail-header h3 { font-size: 16px; font-weight: 600; }
+.gpu-avail-header h3 span { color: var(--accent); }
+
+.gpu-avail-tabs {
+  display: flex; gap: 4px; background: rgba(255,255,255,0.03);
+  border-radius: 8px; padding: 3px;
+}
+.gpu-avail-tab {
+  padding: 6px 16px; border-radius: 6px; border: none; cursor: pointer;
+  font-size: 12px; font-weight: 500; background: transparent;
+  color: var(--text-dim); transition: all 0.2s;
+}
+.gpu-avail-tab:hover { color: var(--text); }
+.gpu-avail-tab.active { background: var(--accent); color: #fff; }
+
+/* Summary cards */
+.gpu-summary-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; margin-bottom: 16px;
+}
+.gpu-sc {
+  background: rgba(255,255,255,0.03); border-radius: 10px;
+  padding: 14px 16px; border: 1px solid var(--border);
+}
+.gpu-sc .gsc-label { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+.gpu-sc .gsc-value { font-size: 24px; font-weight: 700; }
+.gpu-sc .gsc-sub { font-size: 11px; margin-top: 4px; }
+
+/* GPU Grid View */
+.gpu-grid-view {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-bottom: 12px;
+}
+.gpu-card {
+  background: rgba(255,255,255,0.02); border-radius: 10px;
+  padding: 14px; border: 2px solid transparent;
+  position: relative; overflow: hidden; transition: all 0.2s;
+}
+.gpu-card:hover { background: rgba(255,255,255,0.04); }
+.gpu-card.s-free { border-color: rgba(52,211,153,0.3); }
+.gpu-card.s-active { border-color: rgba(108,122,255,0.3); }
+.gpu-card.s-idle { border-color: rgba(251,191,36,0.3); }
+.gpu-card-dot {
+  position: absolute; top: 12px; right: 12px;
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.gpu-card-dot.free { background: var(--green); box-shadow: 0 0 8px rgba(52,211,153,0.5); }
+.gpu-card-dot.active { background: var(--accent); box-shadow: 0 0 8px rgba(108,122,255,0.5); }
+.gpu-card-dot.idle { background: var(--yellow); box-shadow: 0 0 8px rgba(251,191,36,0.5); }
+.gc-idx { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+.gc-status { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.gc-user { font-size: 13px; font-weight: 600; margin-top: 6px; }
+.gc-detail { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+.gc-rt { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.gc-rt-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; }
+.gc-rt-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06); overflow: hidden; margin-top: 2px; }
+.gc-rt-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+/* Timeline View */
+.gpu-timeline-view { overflow-x: auto; }
+.gpu-timeline-inner { min-width: 800px; }
+
+.tl-header { display: flex; margin-bottom: 4px; }
+.tl-label-col { width: 80px; flex-shrink: 0; }
+.tl-bar-col { flex: 1; position: relative; }
+
+.tl-date-divider {
+  position: absolute; top: -2px; bottom: 0;
+  border-left: 1px dashed rgba(255,255,255,0.15);
+  z-index: 5;
+}
+.tl-date-label {
+  position: absolute; top: -18px; transform: translateX(-50%);
+  font-size: 9px; color: var(--text-dim); background: var(--card);
+  padding: 1px 5px; border-radius: 3px; white-space: nowrap;
+}
+
+.tl-hour {
+  position: absolute; font-size: 10px; color: var(--text-dim);
+  transform: translateX(-50%);
+}
+
+.tl-row {
+  display: flex; align-items: center; margin-bottom: 5px; height: 36px;
+}
+.tl-gpu-label {
+  width: 80px; flex-shrink: 0; display: flex;
+  align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+}
+.tl-gpu-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.tl-track {
+  flex: 1; height: 30px; background: rgba(255,255,255,0.03);
+  border-radius: 6px; position: relative; overflow: hidden;
+}
+.tl-block {
+  position: absolute; top: 2px; bottom: 2px; border-radius: 4px;
+  display: flex; align-items: center; padding-left: 6px;
+  font-size: 11px; font-weight: 600; overflow: hidden;
+  white-space: nowrap; cursor: default;
+}
+.tl-now {
+  position: absolute; top: 0; bottom: 0; width: 2px;
+  background: #ff4444; z-index: 10;
+  box-shadow: 0 0 6px rgba(255,68,68,0.6);
+}
+.tl-now-label {
+  position: absolute; transform: translateX(-50%);
+  font-size: 10px; font-weight: 700; color: #ff4444;
+  background: var(--card); padding: 1px 6px; border-radius: 4px;
+}
+
+/* Legend */
+.gpu-legend {
+  display: flex; gap: 14px; margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.gpu-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); }
+.gpu-legend-swatch { width: 14px; height: 14px; border-radius: 4px; }
+
+.status-legend {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.sl-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+.sl-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .schedule-layout { flex-direction: column; }
+  .detail-panel { width: 100%; min-width: unset; position: static; max-height: unset; }
+}
+@media (max-width: 900px) {
+  .gpu-summary-cards { grid-template-columns: 1fr; }
+  .gpu-grid-view { grid-template-columns: repeat(2, 1fr); }
+  .servers-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div><h1><span>ISPL</span> Server Dashboard</h1></div>
+    <div class="header-meta">
+      <div class="live" id="liveIndicator">Live</div>
+      <div>마지막 업데이트: 2026-04-13 15:32:39 (KST)</div>
+      <div style="font-size:11px;margin-top:2px;color:var(--green);">실시간 수집 중</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+    <div class="tabs">
+      <button class="tab" onclick="switchTab('monitor')">서버 모니터링</button>
+      <button class="tab active" onclick="switchTab('schedule')">스케줄 관리</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <label style="font-size:12px;color:var(--text-dim);">시간대:</label>
+      <select style="padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;">
+        <option>🇰🇷 KST (서울)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Monitor Tab -->
+  <div class="monitor-section" id="monitorSection">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div class="servers-grid" id="serversGrid"></div>
+  </div>
+
+  <!-- Schedule Tab -->
+  <div class="schedule-section active" id="scheduleSection">
+    <div class="schedule-layout">
+
+      <!-- LEFT: Timeline → Calendar -->
+      <div class="schedule-main">
+
+        <!-- GPU Availability (top) -->
+        <div class="gpu-avail-section" id="gpuAvailSection">
+          <div class="gpu-avail-header">
+            <h3>
+              <span>ISPL</span> GPU 가용 현황
+              <span style="font-size:12px;color:var(--text-dim);font-weight:400;margin-left:8px;" id="gpuAvailDate">4월 13일 (월)</span>
+            </h3>
+            <div class="gpu-avail-tabs">
+              <button class="gpu-avail-tab active" onclick="switchGpuView('summary',this)">요약</button>
+              <button class="gpu-avail-tab" onclick="switchGpuView('timeline',this)">타임라인</button>
+            </div>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="gpu-summary-cards" id="gpuSummaryCards"></div>
+
+          <!-- Status Legend -->
+          <div class="status-legend" id="statusLegend">
+            <div class="sl-item">
+              <div class="sl-dot" style="background:var(--accent);box-shadow:0 0 6px rgba(108,122,255,0.5);"></div>
+              <span style="color:var(--text-dim)">예약 + 실사용 중</span>
+            </div>
+            <div class="sl-item">
+              <div class="sl-dot" style="background:var(--yellow);box-shadow:0 0 6px rgba(251,191,36,0.5);"></div>
+              <span style="color:var(--text-dim)">예약했지만 미사용</span>
+            </div>
+            <div class="sl-item">
+              <div class="sl-dot" style="background:var(--green);box-shadow:0 0 6px rgba(52,211,153,0.5);"></div>
+              <span style="color:var(--text-dim)">사용 가능</span>
+            </div>
+          </div>
+
+          <!-- Grid View (default) -->
+          <div class="gpu-grid-view" id="gpuGridView"></div>
+
+          <!-- Timeline View -->
+          <div class="gpu-timeline-view" id="gpuTimelineView" style="display:none;"></div>
+
+          <!-- User legend -->
+          <div class="gpu-legend" id="gpuUserLegend"></div>
+        </div>
+
+        <!-- Calendar (below) -->
+        <div class="calendar-section">
+          <div class="calendar-nav">
+            <button onclick="changeMonth(-1)">◀</button>
+            <h2 id="calendarTitle"></h2>
+            <button onclick="changeMonth(1)">▶</button>
+            <button onclick="goToday()" style="margin-left:auto">오늘</button>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Detail Panel -->
+      <div class="detail-panel">
+        <h3 id="detailTitle">2026년 4월 13일</h3>
+        <div id="detailContent"></div>
+        <div class="add-form" id="addForm" style="display:none;">
+          <h3>예약 등록</h3>
+          <div class="form-row">
+            <label>이름</label>
+            <select id="formUser" style="padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;">
+              <option value="">이름 선택...</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>서버</label>
+            <select id="formServer">
+              <option value="NIPA_server">NIPA_server (GPU 1×80GB)</option>
+              <option value="ISPL">ISPL (GPU 8×48GB)</option>
+              <option value="CPU1">CPU1</option>
+              <option value="CPU2">CPU2</option>
+              <option value="CPU3">CPU3</option>
+              <option value="CPU4">CPU4</option>
+            </select>
+          </div>
+          <div class="form-row" id="gpuSelectRow" style="display:none;">
+            <label>GPU 선택</label>
+            <div class="gpu-checkbox-grid" id="gpuCheckboxGrid">
+              <label class="gpu-checkbox-item"><input type="checkbox" value="0">GPU 0</label>
+              <label class="gpu-checkbox-item"><input type="checkbox" value="1">GPU 1</label>
+              <label class="gpu-checkbox-item"><input type="checkbox" value="2">GPU 2</label>
+              <label class="gpu-checkbox-item"><input type="checkbox" value="3">GPU 3</label>
+              <label class="gpu-checkbox-item"><input type="checkbox" value="4">GPU 4</label>
+              <label class="gpu-checkbox-item"><input type="checkbox" value="5">GPU 5</label>
+              <label class="gpu-checkbox-item"><input type="checkbox" value="6">GPU 6</label>
+              <label class="gpu-checkbox-item"><input type="checkbox" value="7">GPU 7</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>시작 시간</label>
+            <input type="time" id="formStart" value="09:00">
+          </div>
+          <div class="form-row">
+            <label>종료 시간</label>
+            <input type="time" id="formEnd" value="18:00">
+          </div>
+          <div class="form-row">
+            <label>메모 (선택)</label>
+            <textarea id="formNote" placeholder="예: 3DGS training"></textarea>
+          </div>
+          <button class="btn-submit">예약 등록</button>
+          <button class="btn-cancel" onclick="document.getElementById('addForm').style.display='none';">취소</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================
+// Constants
+// ============================
+const MEMBER_COLORS = {
+  '이태식': '#f87171', '이유호': '#fb923c', '김선재': '#a78bfa',
+  '박병주': '#fbbf24', '이동호': '#6c7aff', '조동건': '#34d399',
+  '정호진': '#38bdf8', '박현빈': '#f472b6', '정희웅': '#c084fc',
+  '서현민': '#22d3ee', '김수미': '#a3e635'
+};
+
+function resolveColor(name) {
+  if (MEMBER_COLORS[name]) return MEMBER_COLORS[name];
+  if (name === '동호') return MEMBER_COLORS['이동호'];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+  return `hsl(${Math.abs(h) % 360}, 65%, 60%)`;
+}
+
+const SERVER_COLORS = {
+  'NIPA_server': 'nipa', 'ISPL': 'ispl-srv',
+  'CPU1': 'cpu-srv', 'CPU2': 'cpu-srv', 'CPU3': 'cpu-srv', 'CPU4': 'cpu-srv'
+};
+
+const STATUS_LABEL = { active: '정상 사용', idle: '예약만 (미사용)', free: '사용 가능' };
+const STATUS_CSS = { active: 'var(--accent)', idle: 'var(--yellow)', free: 'var(--green)' };
+
+// ============================
+// Demo Data (4/13 실제 데이터)
+// ============================
+const scheduleData = [
+  { date:'2026-04-13', user:'동호', server:'ISPL', start_time:'08:00', end_time:'16:00', gpus:[3,4,5] },
+  { date:'2026-04-13', user:'동호', server:'NIPA_server', start_time:'08:30', end_time:'18:00' },
+  { date:'2026-04-13', user:'정호진', server:'ISPL', start_time:'09:00', end_time:'18:00', gpus:[0] },
+  { date:'2026-04-13', user:'이태식', server:'ISPL', start_time:'14:00', end_time:'23:00', gpus:[1,2] },
+  { date:'2026-04-13', user:'박병주', server:'ISPL', start_time:'16:00', end_time:'23:00', gpus:[4,5] },
+  { date:'2026-04-13', user:'김선재', server:'ISPL', start_time:'09:00', end_time:'23:30', gpus:[6,7] },
+  { date:'2026-04-13', user:'이유호', server:'ISPL', start_time:'18:00', end_time:'24:00', gpus:[0,3] },
+  { date:'2026-04-13', user:'동호', server:'NIPA_server', start_time:'18:00', end_time:'02:00' },
+  { date:'2026-04-14', user:'이유호', server:'ISPL', start_time:'00:00', end_time:'06:00', gpus:[0,3] },
+  { date:'2026-04-14', user:'동호', server:'ISPL', start_time:'10:00', end_time:'22:00', gpus:[2,3] },
+  { date:'2026-04-08', user:'동호', server:'NIPA_server', start_time:'09:00', end_time:'18:00' },
+  { date:'2026-04-08', user:'이태식', server:'ISPL', start_time:'10:00', end_time:'22:00', gpus:[0,1] },
+  { date:'2026-04-08', user:'동호', server:'ISPL', start_time:'14:00', end_time:'23:00', gpus:[3,4,5] },
+  { date:'2026-04-09', user:'동호', server:'NIPA_server', start_time:'08:00', end_time:'20:00' },
+  { date:'2026-04-09', user:'김선재', server:'ISPL', start_time:'09:00', end_time:'23:00', gpus:[6,7] },
+  { date:'2026-04-10', user:'김선재', server:'ISPL', start_time:'09:00', end_time:'23:00', gpus:[6,7] },
+  { date:'2026-04-10', user:'동호', server:'NIPA_server', start_time:'09:00', end_time:'02:00' },
+  { date:'2026-04-11', user:'동호', server:'ISPL', start_time:'09:00', end_time:'23:00', gpus:[0,1,2] },
+  { date:'2026-04-12', user:'동호', server:'NIPA_server', start_time:'09:00', end_time:'22:00' },
+  { date:'2026-04-12', user:'동호', server:'ISPL', start_time:'09:00', end_time:'18:00', gpus:[3,4,5] },
+  { date:'2026-04-12', user:'정호진', server:'ISPL', start_time:'10:00', end_time:'20:00', gpus:[0] },
+  { date:'2026-04-13', user:'정호진', server:'ISPL', start_time:'09:00', end_time:'18:00', gpus:[0] },
+];
+
+const realGpuData = [
+  { index:0, utilization:99, memory_used_mb:6058, memory_total_mb:49140, temperature:63 },
+  { index:1, utilization:0,  memory_used_mb:10,   memory_total_mb:49140, temperature:25 },
+  { index:2, utilization:0,  memory_used_mb:10,   memory_total_mb:49140, temperature:26 },
+  { index:3, utilization:0,  memory_used_mb:10,   memory_total_mb:49140, temperature:24 },
+  { index:4, utilization:0,  memory_used_mb:10,   memory_total_mb:49140, temperature:26 },
+  { index:5, utilization:0,  memory_used_mb:10,   memory_total_mb:49140, temperature:25 },
+  { index:6, utilization:53, memory_used_mb:20091, memory_total_mb:49140, temperature:58 },
+  { index:7, utilization:45, memory_used_mb:20093, memory_total_mb:49140, temperature:52 },
+];
+
+// ============================
+// State
+// ============================
+let currentMonth = new Date(2026, 3, 1);
+let selectedDate = '2026-04-13';
+let gpuViewMode = 'summary';
+const simHour = 15, simMin = 32;
+
+// ============================
+// Utility
+// ============================
+function timeToMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function getEventsForDate(d) { return scheduleData.filter(e => e.date === d); }
+function getISPLEvents(d) { return scheduleData.filter(e => e.date === d && e.server === 'ISPL' && e.gpus); }
+
+function isGpuReservedAt(events, gpu, min) {
+  return events.some(ev => {
+    if (!ev.gpus || !ev.gpus.includes(gpu)) return false;
+    const s = timeToMin(ev.start_time);
+    let e = timeToMin(ev.end_time);
+    if (e <= s) e = 1440;
+    return min >= s && min < e;
+  });
+}
+
+function getReservationAt(events, gpu, min) {
+  for (const ev of events) {
+    if (!ev.gpus || !ev.gpus.includes(gpu)) continue;
+    const s = timeToMin(ev.start_time);
+    let e = timeToMin(ev.end_time);
+    if (e <= s) e = 1440;
+    if (min >= s && min < e) return ev;
+  }
+  return null;
+}
+
+function isReallyUsed(gpu) {
+  const g = realGpuData.find(x => x.index === gpu);
+  return g && (g.utilization > 5 || g.memory_used_mb > 500);
+}
+
+function getGpuStatus(events, gpu, min, isToday) {
+  const reserved = isGpuReservedAt(events, gpu, min);
+  if (!isToday) return reserved ? 'active' : 'free';
+  const used = isReallyUsed(gpu);
+  if (reserved && used) return 'active';
+  if (reserved && !used) return 'idle';
+  return 'free';
+}
+
+// ============================
+// Tab switching
+// ============================
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('monitorSection').classList.toggle('active', tab === 'monitor');
+  document.getElementById('scheduleSection').classList.toggle('active', tab === 'schedule');
+}
+
+// ============================
+// Calendar
+// ============================
+function renderCalendar() {
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  document.getElementById('calendarTitle').textContent = `${year}년 ${month+1}월`;
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month+1, 0);
+  const startDow = firstDay.getDay();
+  const totalDays = lastDay.getDate();
+
+  let html = ['일','월','화','수','목','금','토'].map(d => `<div class="cal-header-cell">${d}</div>`).join('');
+
+  const prevLast = new Date(year, month, 0).getDate();
+  for (let i = startDow-1; i >= 0; i--) {
+    html += `<div class="cal-cell other-month"><span class="day-num">${prevLast-i}</span></div>`;
+  }
+
+  for (let d = 1; d <= totalDays; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dateStr === '2026-04-13';
+    const isSel = dateStr === selectedDate;
+    const events = getEventsForDate(dateStr);
+    const evHTML = events.slice(0,3).map(ev => {
+      const cls = SERVER_COLORS[ev.server] || 'cpu-srv';
+      const c = resolveColor(ev.user);
+      return `<div class="cal-event ${cls}" style="border-left:2px solid ${c};" title="${ev.user}: ${ev.server}">${ev.user} · ${ev.server}</div>`;
+    }).join('') + (events.length > 3 ? `<div style="font-size:10px;color:var(--text-dim)">+${events.length-3}개 더</div>` : '');
+
+    html += `<div class="cal-cell ${isToday?'today':''} ${isSel?'selected':''}" onclick="selectDate('${dateStr}')">
+      <span class="day-num">${d}</span>${evHTML}</div>`;
+  }
+
+  const rem = 7 - ((startDow + totalDays) % 7);
+  if (rem < 7) for (let d=1; d<=rem; d++) html += `<div class="cal-cell other-month"><span class="day-num">${d}</span></div>`;
+
+  document.getElementById('calendarGrid').innerHTML = html;
+}
+
+function selectDate(dateStr) {
+  selectedDate = dateStr;
+  const events = getEventsForDate(dateStr);
+  const d = new Date(dateStr + 'T00:00:00');
+  const dayNames = ['일','월','화','수','목','금','토'];
+  document.getElementById('detailTitle').textContent = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${dayNames[d.getDay()]})`;
+
+  // Update availability date
+  document.getElementById('gpuAvailDate').textContent = `${d.getMonth()+1}월 ${d.getDate()}일 (${dayNames[d.getDay()]})`;
+
+  if (events.length === 0) {
+    document.getElementById('detailContent').innerHTML = `<p style="color:var(--text-dim);font-size:13px;">이 날에 등록된 예약이 없습니다.</p>`;
+  } else {
+    document.getElementById('detailContent').innerHTML = events.map(ev => {
+      const c = resolveColor(ev.user);
+      const gpuInfo = ev.gpus ? `<div class="ev-time">GPU: ${ev.gpus.join(', ')}</div>` : '';
+      return `<div class="event-detail" style="border-left-color:${c};">
+        <div class="ev-server">${ev.server}</div>
+        <div class="ev-user" style="color:${c};">${ev.user}</div>
+        <div class="ev-time">${ev.start_time} ~ ${ev.end_time}</div>
+        ${gpuInfo}
+        ${ev.note ? `<div class="ev-note">${ev.note}</div>` : ''}
+        <button class="ev-delete">예약 취소</button>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('addForm').style.display = 'block';
+  renderCalendar();
+  renderGpuAvailability();
+}
+
+function changeMonth(delta) { currentMonth.setMonth(currentMonth.getMonth()+delta); renderCalendar(); }
+function goToday() { currentMonth = new Date(2026,3,1); renderCalendar(); selectDate('2026-04-13'); }
+
+// ============================
+// GPU Availability
+// ============================
+function switchGpuView(mode, btn) {
+  gpuViewMode = mode;
+  document.querySelectorAll('.gpu-avail-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderGpuAvailability();
+}
+
+function renderGpuAvailability() {
+  const nowMin = simHour*60 + simMin;
+  const isToday = selectedDate === '2026-04-13';
+  const events = getISPLEvents(selectedDate);
+
+  let freeN=0, activeN=0, idleN=0;
+  const statuses = [];
+  for (let i=0; i<8; i++) {
+    const s = getGpuStatus(events, i, nowMin, isToday);
+    statuses.push(s);
+    if (s==='free') freeN++; else if (s==='active') activeN++; else idleN++;
+  }
+
+  document.getElementById('gpuSummaryCards').innerHTML = `
+    <div class="gpu-sc">
+      <div class="gsc-label">사용 가능</div>
+      <div class="gsc-value" style="color:var(--green);">${freeN} <span style="font-size:14px;color:var(--text-dim)">/ 8</span></div>
+      <div class="gsc-sub" style="color:var(--green);">${freeN*48}GB VRAM 가용</div>
+    </div>
+    <div class="gpu-sc">
+      <div class="gsc-label">정상 사용</div>
+      <div class="gsc-value" style="color:var(--accent);">${activeN}</div>
+      <div class="gsc-sub" style="color:var(--accent);">예약 + 실사용 중</div>
+    </div>
+    <div class="gpu-sc">
+      <div class="gsc-label">⚠ 예약만 (미사용)</div>
+      <div class="gsc-value" style="color:var(--yellow);">${idleN}</div>
+      <div class="gsc-sub" style="color:var(--yellow);">${idleN > 0 ? 'GPU 낭비 중!' : '없음'}</div>
+    </div>`;
+
+  if (gpuViewMode === 'summary') {
+    document.getElementById('gpuGridView').style.display = 'grid';
+    document.getElementById('gpuTimelineView').style.display = 'none';
+    renderGpuGrid(events, statuses, nowMin, isToday);
+  } else {
+    document.getElementById('gpuGridView').style.display = 'none';
+    document.getElementById('gpuTimelineView').style.display = 'block';
+    renderTimeline(events, statuses, nowMin, isToday);
+  }
+
+  renderUserLegend(events);
+}
+
+function renderGpuGrid(events, statuses, nowMin, isToday) {
+  let html = '';
+  for (let i=0; i<8; i++) {
+    const st = statuses[i];
+    const res = getReservationAt(events, i, nowMin);
+    const gpu = realGpuData.find(g => g.index === i);
+    const uc = res ? resolveColor(res.user) : null;
+
+    let info = '';
+    if (st === 'free') {
+      let next = null;
+      for (const ev of events) {
+        if (!ev.gpus || !ev.gpus.includes(i)) continue;
+        const s = timeToMin(ev.start_time);
+        if (s > nowMin && (!next || s < next)) next = s;
+      }
+      if (next) {
+        info = `${String(Math.floor(next/60)).padStart(2,'0')}:${String(next%60).padStart(2,'0')}부터 예약 있음`;
+      } else {
+        info = '오늘 남은 예약 없음';
+      }
+    } else if (res) {
+      info = `${res.end_time}까지`;
+    }
+
+    const util = gpu ? gpu.utilization : 0;
+    const memU = gpu ? (gpu.memory_used_mb/1024).toFixed(1) : '0';
+    const memT = gpu ? (gpu.memory_total_mb/1024).toFixed(0) : '48';
+    const memP = gpu ? (gpu.memory_used_mb/gpu.memory_total_mb*100).toFixed(0) : 0;
+    const temp = gpu ? gpu.temperature : '-';
+
+    html += `<div class="gpu-card s-${st}">
+      <div class="gpu-card-dot ${st}"></div>
+      <div class="gc-idx">GPU ${i}</div>
+      <div class="gc-status" style="color:${STATUS_CSS[st]};">${STATUS_LABEL[st]}</div>
+      ${res ? `<div class="gc-user" style="color:${uc};">${res.user}</div>
+        <div class="gc-detail">${res.start_time} ~ ${res.end_time}</div>` :
+        `<div class="gc-detail" style="color:var(--green);margin-top:6px;">${info}</div>`}
+      ${isToday ? `<div class="gc-rt">
+        <div class="gc-rt-row"><span style="color:var(--text-dim)">Util</span>
+          <span style="font-weight:600;color:${util>50?'var(--accent-light)':util>0?'var(--yellow)':'var(--text-dim)'}">${util}%</span></div>
+        <div class="gc-rt-bar"><div class="gc-rt-fill" style="width:${util}%;background:${util>50?'var(--accent)':util>0?'var(--yellow)':'var(--border)'}"></div></div>
+        <div class="gc-rt-row" style="margin-top:6px;"><span style="color:var(--text-dim)">VRAM</span>
+          <span style="font-weight:600;color:var(--text-dim)">${memU}/${memT}GB</span></div>
+        <div class="gc-rt-bar"><div class="gc-rt-fill" style="width:${memP}%;background:var(--green)"></div></div>
+        <div class="gc-rt-row" style="margin-top:4px;"><span style="color:var(--text-dim)">Temp</span>
+          <span style="font-weight:600;color:${temp>60?'var(--orange)':'var(--text-dim)'}">${temp}°C</span></div>
+      </div>` : ''}
+    </div>`;
+  }
+  document.getElementById('gpuGridView').innerHTML = html;
+}
+
+function renderTimeline(events, statuses, nowMin, isToday) {
+  // 선택된 날짜 파싱
+  const selD = new Date(selectedDate + 'T00:00:00');
+  const nextD = new Date(selD); nextD.setDate(nextD.getDate()+1);
+  const selLabel = `${selD.getMonth()+1}/${selD.getDate()}`;
+  const nextLabel = `${nextD.getMonth()+1}/${nextD.getDate()}`;
+
+  // 타임라인 범위: 30시간 (00:00 ~ +06:00 다음날)
+  const TOTAL_HOURS = 30;
+  const TOTAL_MIN = TOTAL_HOURS * 60;
+
+  // 다음날 새벽 예약도 가져오기
+  const nextDateStr = `${nextD.getFullYear()}-${String(nextD.getMonth()+1).padStart(2,'0')}-${String(nextD.getDate()).padStart(2,'0')}`;
+  const nextDayEvents = getISPLEvents(nextDateStr).filter(ev => {
+    const s = timeToMin(ev.start_time);
+    return s < 360; // 06:00 이전
+  });
+
+  let html = '<div class="gpu-timeline-inner">';
+
+  // 시간 축 (0~30h displayed as 00~24 + 00~06)
+  html += '<div class="tl-header" style="height:28px;"><div class="tl-label-col"></div><div class="tl-bar-col" style="position:relative;">';
+
+  for (let h=0; h<=TOTAL_HOURS; h+=2) {
+    const displayH = h < 24 ? h : h - 24;
+    const pct = (h/TOTAL_HOURS)*100;
+    html += `<div class="tl-hour" style="left:${pct}%">${String(displayH).padStart(2,'0')}</div>`;
+  }
+
+  // 날짜 구분선 (24:00 = 다음날 00:00)
+  const dayBorderPct = (24/TOTAL_HOURS)*100;
+  html += `<div class="tl-date-divider" style="left:${dayBorderPct}%;">
+    <div class="tl-date-label" style="top:-16px;left:0;transform:translateX(-100%) translateX(-4px);">${selLabel}</div>
+    <div class="tl-date-label" style="top:-16px;left:0;transform:translateX(4px);">${nextLabel}</div>
+  </div>`;
+
+  html += '</div></div>';
+  html += '<div style="height:6px;"></div>';
+
+  // GPU rows
+  for (let i=0; i<8; i++) {
+    const st = statuses[i];
+
+    // 당일 블록
+    const dayBlocks = events.filter(ev => ev.gpus && ev.gpus.includes(i));
+    // 다음날 새벽 블록
+    const nightBlocks = nextDayEvents.filter(ev => ev.gpus && ev.gpus.includes(i));
+
+    html += `<div class="tl-row">
+      <div class="tl-gpu-label">
+        <div class="tl-gpu-dot" style="background:${STATUS_CSS[st]};box-shadow:0 0 6px ${STATUS_CSS[st]}44;"></div>
+        GPU ${i}
+      </div>
+      <div class="tl-track">`;
+
+    // 당일 블록 렌더링
+    for (const r of dayBlocks) {
+      let startMin = timeToMin(r.start_time);
+      let endMin = timeToMin(r.end_time);
+      if (endMin <= startMin) endMin = TOTAL_MIN; // 자정 넘김 → 30h까지 연장
+      else if (endMin > 1440) endMin = Math.min(endMin, TOTAL_MIN);
+
+      const startPct = (startMin/TOTAL_MIN)*100;
+      const endPct = (Math.min(endMin, TOTAL_MIN)/TOTAL_MIN)*100;
+      const color = resolveColor(r.user);
+
+      // idle 체크
+      const isIdle = isToday && isGpuReservedAt([r], i, nowMin) && !isReallyUsed(i);
+
+      html += `<div class="tl-block" style="left:${startPct}%;width:${endPct-startPct}%;background:${color}${isIdle?'22':'33'};border:1px solid ${color}${isIdle?'55':'88'};color:${color};${isIdle?'background-image:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(255,255,255,0.04) 3px,rgba(255,255,255,0.04) 6px);':''}" title="${r.user}: ${r.start_time}~${r.end_time}${isIdle?' (미사용)':''}">${r.user}${isIdle?' ⚠':''}</div>`;
+    }
+
+    // 다음날 새벽 블록 렌더링 (24h 이후 영역)
+    for (const r of nightBlocks) {
+      const startMin = timeToMin(r.start_time) + 1440; // +24h offset
+      let endMin = timeToMin(r.end_time) + 1440;
+      if (endMin > TOTAL_MIN) endMin = TOTAL_MIN;
+
+      const startPct = (startMin/TOTAL_MIN)*100;
+      const endPct = (endMin/TOTAL_MIN)*100;
+      const color = resolveColor(r.user);
+
+      html += `<div class="tl-block" style="left:${startPct}%;width:${endPct-startPct}%;background:${color}22;border:1px dashed ${color}66;color:${color};opacity:0.7;" title="${r.user}: ${nextLabel} ${r.start_time}~${r.end_time} (다음날)">${r.user}</div>`;
+    }
+
+    // NOW indicator
+    if (isToday) {
+      html += `<div class="tl-now" style="left:${(nowMin/TOTAL_MIN)*100}%"></div>`;
+    }
+
+    // 날짜 구분 세로선
+    html += `<div style="position:absolute;left:${dayBorderPct}%;top:0;bottom:0;border-left:1px dashed rgba(255,255,255,0.1);z-index:3;"></div>`;
+
+    html += '</div></div>';
+  }
+
+  // NOW label
+  if (isToday) {
+    html += `<div class="tl-header"><div class="tl-label-col"></div><div class="tl-bar-col" style="height:18px;position:relative;">
+      <div class="tl-now-label" style="left:${(nowMin/TOTAL_MIN)*100}%">${String(simHour).padStart(2,'0')}:${String(simMin).padStart(2,'0')} NOW</div>
+    </div></div>`;
+  }
+
+  html += '</div>';
+  document.getElementById('gpuTimelineView').innerHTML = html;
+}
+
+function renderUserLegend(events) {
+  const users = [...new Set(events.map(ev => ev.user))];
+  document.getElementById('gpuUserLegend').innerHTML = users.map(u => {
+    const c = resolveColor(u);
+    return `<div class="gpu-legend-item">
+      <div class="gpu-legend-swatch" style="background:${c}55;border:1px solid ${c};"></div>
+      <span>${u}</span>
+    </div>`;
+  }).join('');
+}
+
+// ============================
+// Monitor Tab (full — all servers from real data)
+// ============================
+const allServers = [
+  {
+    name: "NIPA_server", type: "gpu", status: "online",
+    gpu_count: 1, gpu_memory_gb: 80,
+    gpus: [{index:0, name:"NVIDIA H100 80GB HBM3", utilization:100, memory_used_mb:56664, memory_total_mb:81559, temperature:45}],
+    cpu: {cores:24, load_avg:8.87, usage_percent:21.4},
+    memory: {used_mb:14901, total_mb:241600, percent:6.2},
+    disk: {used:"577G", total:"993G", percent:59},
+    users: [],
+    gpu_processes: [{pid:76391,name:"python",memory_mb:9166},{pid:78656,name:"python",memory_mb:10394},{pid:78711,name:"python",memory_mb:10856},{pid:79170,name:"python",memory_mb:3924},{pid:103466,name:"python",memory_mb:22292}]
+  },
+  {
+    name: "ISPL", type: "gpu", status: "online",
+    gpu_count: 8, gpu_memory_gb: 48,
+    gpus: realGpuData.map(g => ({...g, name:"NVIDIA RTX A6000"})),
+    cpu: {cores:48, load_avg:40.35, usage_percent:12.0},
+    memory: {used_mb:76734, total_mb:709364, percent:10.8},
+    disk: {used:"2.9T", total:"3.6T", percent:84},
+    users: ["ispl"],
+    gpu_processes: [{pid:3011582,name:"python",memory_mb:3344},{pid:3027881,name:"python",memory_mb:2696},{pid:2796492,name:"python",memory_mb:6690},{pid:2796491,name:"python",memory_mb:6690},{pid:2796490,name:"python",memory_mb:6690},{pid:2796493,name:"python",memory_mb:6690},{pid:2796495,name:"python",memory_mb:6690},{pid:2796494,name:"python",memory_mb:6692}]
+  },
+  {
+    name: "CPU1", type: "cpu", status: "online",
+    cpu: {cores:64, load_avg:0.19, usage_percent:0.8},
+    memory: {used_mb:9439, total_mb:773344, percent:1.2},
+    disk: {used:"34G", total:"879G", percent:5},
+    users: ["user"]
+  },
+  {
+    name: "CPU2", type: "cpu", status: "online",
+    cpu: {cores:64, load_avg:0.24, usage_percent:1.0},
+    memory: {used_mb:5164, total_mb:773344, percent:0.7},
+    disk: {used:"45G", total:"879G", percent:6},
+    users: ["user"]
+  },
+  {
+    name: "CPU3", type: "cpu", status: "online",
+    cpu: {cores:64, load_avg:0.03, usage_percent:0.8},
+    memory: {used_mb:3931, total_mb:773344, percent:0.5},
+    disk: {used:"33G", total:"879G", percent:4},
+    users: ["user"]
+  },
+  {
+    name: "CPU4", type: "cpu", status: "online",
+    cpu: {cores:64, load_avg:0.00, usage_percent:0.3},
+    memory: {used_mb:5203, total_mb:773344, percent:0.7},
+    disk: {used:"156G", total:"879G", percent:19},
+    users: ["user"]
+  }
+];
+
+function renderMonitor() {
+  const online = allServers.filter(s => s.status === 'online').length;
+  const totalGPU = allServers.filter(s => s.type === 'gpu').reduce((sum,s) => sum + (s.gpu_count||0), 0);
+  const usedGPU = allServers.filter(s => s.type === 'gpu' && s.status === 'online')
+    .reduce((sum,s) => sum + (s.gpus||[]).filter(g => g.utilization > 10).length, 0);
+  const allUsers = [...new Set(allServers.flatMap(s => s.users||[]))];
+
+  document.getElementById('summaryBar').innerHTML = `
+    <div class="summary-card"><div class="sc-label">온라인 서버</div>
+      <div class="sc-value online">${online} <span style="font-size:14px;color:var(--text-dim)">/ ${allServers.length}</span></div></div>
+    <div class="summary-card"><div class="sc-label">오프라인 서버</div>
+      <div class="sc-value">${allServers.length - online}</div></div>
+    <div class="summary-card"><div class="sc-label">GPU 사용 현황</div>
+      <div class="sc-value">${usedGPU} <span style="font-size:14px;color:var(--text-dim)">/ ${totalGPU}</span></div></div>
+    <div class="summary-card"><div class="sc-label">접속 사용자</div>
+      <div class="sc-value">${allUsers.length}</div></div>`;
+
+  document.getElementById('serversGrid').innerHTML = allServers.map(s => renderServerCard(s)).join('');
+}
+
+function renderServerCard(s) {
+  const isGPU = s.type === 'gpu';
+  const isOn = s.status === 'online';
+
+  let gpuHTML = '';
+  if (isGPU && isOn && s.gpus && s.gpus.length) {
+    gpuHTML = '<div class="gpu-list">' + s.gpus.map(g => {
+      const pct = g.memory_total_mb > 0 ? (g.memory_used_mb/g.memory_total_mb*100).toFixed(0) : 0;
+      return `<div class="gpu-item"><span class="gpu-label">GPU ${g.index}</span>
+        <div class="bar-container"><div class="bar-fill gpu" style="width:${pct}%"></div>
+        <span class="bar-text">${pct}% · ${(g.memory_used_mb/1024).toFixed(1)}/${(g.memory_total_mb/1024).toFixed(0)}GB · ${g.temperature}°C</span></div></div>`;
+    }).join('') + '</div>';
+  }
+
+  let sysHTML = '';
+  if (isOn) {
+    const cpuPct = s.cpu?.usage_percent || 0;
+    const memPct = s.memory?.percent || 0;
+    sysHTML = `
+      <div class="gpu-item"><span class="gpu-label">CPU</span>
+        <div class="bar-container"><div class="bar-fill cpu-bar" style="width:${Math.min(cpuPct,100)}%"></div>
+        <span class="bar-text">${cpuPct}% · ${s.cpu?.cores||'?'} cores · load ${s.cpu?.load_avg||'?'}</span></div></div>
+      <div class="gpu-item"><span class="gpu-label">RAM</span>
+        <div class="bar-container"><div class="bar-fill mem" style="width:${Math.min(memPct,100)}%"></div>
+        <span class="bar-text">${memPct}% · ${((s.memory?.used_mb||0)/1024).toFixed(1)}/${((s.memory?.total_mb||0)/1024).toFixed(0)}GB</span></div></div>`;
+  }
+
+  let usersHTML = '';
+  if (isOn && s.users && s.users.length) {
+    usersHTML = `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <h4 style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">접속 사용자</h4>
+      ${s.users.map(u => `<span class="user-tag" style="display:inline-block;background:rgba(108,122,255,0.12);color:var(--accent-light);padding:3px 10px;border-radius:12px;font-size:12px;margin:2px 4px 2px 0;">${u}</span>`).join('')}
+    </div>`;
+  }
+
+  let procHTML = '';
+  if (isOn && s.gpu_processes && s.gpu_processes.length) {
+    procHTML = `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <h4 style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">GPU 프로세스</h4>
+      ${s.gpu_processes.map(p => `<div style="font-size:11px;color:var(--text-dim);padding:3px 0;display:flex;justify-content:space-between;">
+        <span>${p.name}</span><span>${(p.memory_mb/1024).toFixed(1)}GB</span></div>`).join('')}
+    </div>`;
+  }
+
+  let diskHTML = '';
+  if (isOn && s.disk) {
+    diskHTML = `<div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px 12px;font-size:12px;flex:1;min-width:80px;">
+        <div style="color:var(--text-dim);margin-bottom:2px;">디스크</div>
+        <div style="font-weight:600;font-size:14px;">${s.disk.used} / ${s.disk.total}</div>
+      </div>
+    </div>`;
+  }
+
+  const typeLabel = isGPU ? `GPU ${s.gpu_count}× ${s.gpu_memory_gb}GB` : 'CPU';
+  const typeClass = isGPU ? 'gpu' : 'cpu';
+
+  return `<div class="server-card" ${isOn?'':'style="opacity:0.5;"'}>
+    <div class="card-header">
+      <div><h3>${s.name}</h3><span class="server-type ${typeClass}" style="${!isGPU?'background:rgba(251,191,36,0.15);color:var(--yellow);':''}">${typeLabel}</span></div>
+      <span class="status-badge ${s.status}">${isOn?'Online':'Offline'}</span>
+    </div>
+    ${gpuHTML}${sysHTML}${usersHTML}${procHTML}${diskHTML}
+  </div>`;
+}
+
+// ============================
+// Form: Member dropdown
+// ============================
+function populateMembers() {
+  const sel = document.getElementById('formUser');
+  Object.keys(MEMBER_COLORS).forEach(n => {
+    const o = document.createElement('option'); o.value = n; o.textContent = n;
+    sel.appendChild(o);
+  });
+}
+
+document.getElementById('formServer').addEventListener('change', function() {
+  document.getElementById('gpuSelectRow').style.display = this.value === 'ISPL' ? 'block' : 'none';
+});
+
+document.querySelectorAll('#gpuCheckboxGrid .gpu-checkbox-item').forEach(item => {
+  item.addEventListener('click', function(e) {
+    e.preventDefault();
+    const cb = this.querySelector('input[type="checkbox"]');
+    cb.checked = !cb.checked;
+    this.classList.toggle('checked', cb.checked);
+  });
+});
+
+// ============================
+// Init
+// ============================
+(function init() {
+  populateMembers();
+  renderMonitor();
+  renderCalendar();
+  selectDate('2026-04-13');
+})();
+</script>
+</body>
+</html>
