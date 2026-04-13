@@ -6,7 +6,7 @@
 #
 # 종료: Ctrl+C
 
-INTERVAL=300  # 수집 간격 (초). 원하는 값으로 변경 가능
+INTERVAL=900  # 수집 간격 (초). 15분 = 900초
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
