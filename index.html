@@ -458,8 +458,8 @@ body {
           </div>
           <div class="gpu-summary-cards" id="gpuSummaryCards"></div>
           <div class="status-legend">
-            <div class="sl-item"><div class="sl-dot" style="background:var(--accent);box-shadow:0 0 6px rgba(108,122,255,0.5);"></div><span style="color:var(--text-dim)">예약 + 실사용 중</span></div>
-            <div class="sl-item"><div class="sl-dot" style="background:var(--yellow);box-shadow:0 0 6px rgba(251,191,36,0.5);"></div><span style="color:var(--text-dim)">예약했지만 미사용</span></div>
+            <div class="sl-item"><div class="sl-dot" style="background:var(--accent);box-shadow:0 0 6px rgba(108,122,255,0.5);"></div><span style="color:var(--text-dim)">사용 중</span></div>
+            <div class="sl-item"><div class="sl-dot" style="background:var(--yellow);box-shadow:0 0 6px rgba(251,191,36,0.5);"></div><span style="color:var(--text-dim)">예약 중</span></div>
             <div class="sl-item"><div class="sl-dot" style="background:var(--green);box-shadow:0 0 6px rgba(52,211,153,0.5);"></div><span style="color:var(--text-dim)">사용 가능</span></div>
           </div>
           <div class="gpu-grid-view" id="gpuGridView"></div>
@@ -570,7 +570,7 @@ function resolveColor(name) {
   return `hsl(${Math.abs(h) % 360}, 65%, 60%)`;
 }
 
-const GPU_STATUS_LABEL = { active: '정상 사용', idle: '예약만 (미사용)', free: '사용 가능' };
+const GPU_STATUS_LABEL = { active: '사용 중', idle: '예약 중', free: '사용 가능' };
 const GPU_STATUS_CSS = { active: 'var(--accent)', idle: 'var(--yellow)', free: 'var(--green)' };
 
 // ============================
@@ -1176,12 +1176,12 @@ function renderGpuAvailability() {
     <div class="gpu-sc"><div class="gsc-label">사용 가능</div>
       <div class="gsc-value" style="color:var(--green);">${freeN} <span style="font-size:14px;color:var(--text-dim)">/ 8</span></div>
       <div class="gsc-sub" style="color:var(--green);">${freeN*48}GB VRAM 가용</div></div>
-    <div class="gpu-sc"><div class="gsc-label">정상 사용</div>
+    <div class="gpu-sc"><div class="gsc-label">사용 중</div>
       <div class="gsc-value" style="color:var(--accent);">${activeN}</div>
-      <div class="gsc-sub" style="color:var(--accent);">예약 + 실사용 중</div></div>
-    <div class="gpu-sc"><div class="gsc-label">⚠ 예약만 (미사용)</div>
+      <div class="gsc-sub" style="color:var(--accent);">실제 GPU 사용 중</div></div>
+    <div class="gpu-sc"><div class="gsc-label">예약 중</div>
       <div class="gsc-value" style="color:var(--yellow);">${idleN}</div>
-      <div class="gsc-sub" style="color:var(--yellow);">${idleN > 0 ? 'GPU 낭비 중!' : '없음'}</div></div>`;
+      <div class="gsc-sub" style="color:var(--yellow);">${idleN > 0 ? '예약됨 · 미사용' : '없음'}</div></div>`;
 
   if (gpuViewMode === 'summary') {
     document.getElementById('gpuGridView').style.display = 'grid';
