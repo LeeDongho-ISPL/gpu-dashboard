@@ -9,8 +9,8 @@
   "gpu_count": 1,
   "gpu_memory_gb": 80,
   "gpus": [{"index":0,"name":"NVIDIA H100 80GB HBM3","utilization":0,"memory_used_mb":0,"memory_total_mb":81559,"temperature":30}],
-  "cpu": {"cores": 24, "load_avg": 0.17, "usage_percent": 0.9},
-  "memory": {"used_mb": 37662, "total_mb": 241600, "percent": 15.6},
+  "cpu": {"cores": 24, "load_avg": 0.17, "usage_percent": 1.2},
+  "memory": {"used_mb": 37661, "total_mb": 241600, "percent": 15.6},
   "disk": {"used": "812G", "total": "993G", "percent": 82},
   "users": [],
   "gpu_processes": []
@@ -35,7 +35,7 @@
   "status": "online",
   "timestamp": "2026-04-14T12:33:29Z",
   "cpu": {"cores": 64, "load_avg": 0.41, "usage_percent": 0.1},
-  "memory": {"used_mb": 4362, "total_mb": 773344, "percent": 0.6},
+  "memory": {"used_mb": 4360, "total_mb": 773344, "percent": 0.6},
   "disk": {"used": "34G", "total": "879G", "percent": 5},
   "users": []
 },
@@ -45,7 +45,7 @@
   "status": "online",
   "timestamp": "2026-04-14T12:33:29Z",
   "cpu": {"cores": 64, "load_avg": 0.08, "usage_percent": 0.8},
-  "memory": {"used_mb": 5711, "total_mb": 773344, "percent": 0.7},
+  "memory": {"used_mb": 5703, "total_mb": 773344, "percent": 0.7},
   "disk": {"used": "44G", "total": "879G", "percent": 6},
   "users": ["user"]
 },
@@ -55,7 +55,7 @@
   "status": "online",
   "timestamp": "2026-04-14T12:33:29Z",
   "cpu": {"cores": 64, "load_avg": 0.16, "usage_percent": 1.0},
-  "memory": {"used_mb": 3912, "total_mb": 773344, "percent": 0.5},
+  "memory": {"used_mb": 3904, "total_mb": 773344, "percent": 0.5},
   "disk": {"used": "33G", "total": "879G", "percent": 4},
   "users": ["user"]
 },
@@ -65,7 +65,7 @@
   "status": "online",
   "timestamp": "2026-04-14T12:33:29Z",
   "cpu": {"cores": 64, "load_avg": 0.07, "usage_percent": 0.7},
-  "memory": {"used_mb": 5288, "total_mb": 773344, "percent": 0.7},
+  "memory": {"used_mb": 5281, "total_mb": 773344, "percent": 0.7},
   "disk": {"used": "156G", "total": "879G", "percent": 19},
   "users": ["user"]
 }
