@@ -1,41 +1,41 @@
 {
-  "last_updated": "2026-04-22T22:56:32Z",
+  "last_updated": "2026-04-22T23:12:01Z",
   "servers": [
     {
   "name": "NIPA_server",
   "type": "gpu",
   "status": "online",
-  "timestamp": "2026-04-22T22:56:32Z",
+  "timestamp": "2026-04-22T23:12:01Z",
   "gpu_count": 1,
   "gpu_memory_gb": 80,
-  "gpus": [{"index":0,"name":"NVIDIA H100 80GB HBM3","utilization":100,"memory_used_mb":22155,"memory_total_mb":81559,"temperature":47}],
-  "cpu": {"cores": 24, "load_avg": 2.05, "usage_percent": 3.5},
-  "memory": {"used_mb": 10939, "total_mb": 241600, "percent": 4.5},
+  "gpus": [{"index":0,"name":"NVIDIA H100 80GB HBM3","utilization":100,"memory_used_mb":19321,"memory_total_mb":81559,"temperature":54}],
+  "cpu": {"cores": 24, "load_avg": 2.28, "usage_percent": 5.3},
+  "memory": {"used_mb": 10830, "total_mb": 241600, "percent": 4.5},
   "disk": {"used": "761G", "total": "993G", "percent": 77},
   "users": ["ispl"],
-  "gpu_processes": [{"pid":1514344,"name":"python","memory_mb":22146}]
+  "gpu_processes": [{"pid":1543881,"name":"python","memory_mb":19312}]
 },
     {
   "name": "ISPL",
   "type": "gpu",
   "status": "online",
-  "timestamp": "2026-04-22T22:56:32Z",
+  "timestamp": "2026-04-22T23:12:01Z",
   "gpu_count": 8,
   "gpu_memory_gb": 48,
-  "gpus": [{"index":0,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":32289,"memory_total_mb":49140,"temperature":42},{"index":1,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":24},{"index":2,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":25},{"index":3,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":25},{"index":4,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":12277,"memory_total_mb":49140,"temperature":59},{"index":5,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":26},{"index":6,"name":"NVIDIA RTX A6000","utilization":99,"memory_used_mb":14413,"memory_total_mb":49140,"temperature":65},{"index":7,"name":"NVIDIA RTX A6000","utilization":99,"memory_used_mb":19413,"memory_total_mb":49140,"temperature":62}],
-  "cpu": {"cores": 48, "load_avg": 16.01, "usage_percent": 9.9},
-  "memory": {"used_mb": 89399, "total_mb": 709363, "percent": 12.6},
+  "gpus": [{"index":0,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":24},{"index":1,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":24},{"index":2,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":25},{"index":3,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":24},{"index":4,"name":"NVIDIA RTX A6000","utilization":97,"memory_used_mb":11867,"memory_total_mb":49140,"temperature":68},{"index":5,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":26},{"index":6,"name":"NVIDIA RTX A6000","utilization":99,"memory_used_mb":15163,"memory_total_mb":49140,"temperature":69},{"index":7,"name":"NVIDIA RTX A6000","utilization":1,"memory_used_mb":16759,"memory_total_mb":49140,"temperature":56}],
+  "cpu": {"cores": 48, "load_avg": 12.17, "usage_percent": 9.2},
+  "memory": {"used_mb": 86569, "total_mb": 709363, "percent": 12.2},
   "disk": {"used": "1.8T", "total": "3.6T", "percent": 52},
   "users": ["ispl"],
-  "gpu_processes": [{"pid":2647535,"name":"python","memory_mb":32274},{"pid":2635644,"name":"python","memory_mb":12504},{"pid":2604049,"name":"python","memory_mb":15036},{"pid":2525879,"name":"python","memory_mb":19398}]
+  "gpu_processes": [{"pid":2635644,"name":"python","memory_mb":11634},{"pid":2604049,"name":"python","memory_mb":15148},{"pid":2525879,"name":"python","memory_mb":16744}]
 },
     {
   "name": "CPU1",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-04-22T22:56:32Z",
+  "timestamp": "2026-04-22T23:12:01Z",
   "cpu": {"cores": 64, "load_avg": 0.00, "usage_percent": 0.1},
-  "memory": {"used_mb": 4445, "total_mb": 773344, "percent": 0.6},
+  "memory": {"used_mb": 4404, "total_mb": 773344, "percent": 0.6},
   "disk": {"used": "34G", "total": "879G", "percent": 5},
   "users": ["user"]
 },
@@ -43,9 +43,9 @@
   "name": "CPU2",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-04-22T22:56:32Z",
-  "cpu": {"cores": 64, "load_avg": 0.11, "usage_percent": 0.2},
-  "memory": {"used_mb": 6089, "total_mb": 773344, "percent": 0.8},
+  "timestamp": "2026-04-22T23:12:01Z",
+  "cpu": {"cores": 64, "load_avg": 0.23, "usage_percent": 0.1},
+  "memory": {"used_mb": 6110, "total_mb": 773344, "percent": 0.8},
   "disk": {"used": "45G", "total": "879G", "percent": 6},
   "users": ["user"]
 },
@@ -53,9 +53,9 @@
   "name": "CPU3",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-04-22T22:56:32Z",
+  "timestamp": "2026-04-22T23:12:01Z",
   "cpu": {"cores": 64, "load_avg": 0.00, "usage_percent": 0.1},
-  "memory": {"used_mb": 3940, "total_mb": 773344, "percent": 0.5},
+  "memory": {"used_mb": 3925, "total_mb": 773344, "percent": 0.5},
   "disk": {"used": "33G", "total": "879G", "percent": 4},
   "users": ["user"]
 },
@@ -63,9 +63,9 @@
   "name": "CPU4",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-04-22T22:56:32Z",
-  "cpu": {"cores": 64, "load_avg": 0.00, "usage_percent": 0.1},
-  "memory": {"used_mb": 5423, "total_mb": 773344, "percent": 0.7},
+  "timestamp": "2026-04-22T23:12:01Z",
+  "cpu": {"cores": 64, "load_avg": 0.00, "usage_percent": 0.0},
+  "memory": {"used_mb": 5414, "total_mb": 773344, "percent": 0.7},
   "disk": {"used": "157G", "total": "879G", "percent": 19},
   "users": ["user"]
 }
