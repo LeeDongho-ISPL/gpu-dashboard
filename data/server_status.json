@@ -1,41 +1,41 @@
 {
-  "last_updated": "2026-05-16T14:28:31Z",
+  "last_updated": "2026-05-16T14:43:59Z",
   "servers": [
     {
   "name": "NIPA_server",
   "type": "gpu",
   "status": "online",
-  "timestamp": "2026-05-16T14:28:31Z",
+  "timestamp": "2026-05-16T14:43:59Z",
   "gpu_count": 1,
   "gpu_memory_gb": 80,
-  "gpus": [{"index":0,"name":"NVIDIA H100 80GB HBM3","utilization":99,"memory_used_mb":18871,"memory_total_mb":81559,"temperature":38}],
-  "cpu": {"cores": 24, "load_avg": 5.45, "usage_percent": 11.1},
-  "memory": {"used_mb": 14704, "total_mb": 241600, "percent": 6.1},
+  "gpus": [{"index":0,"name":"NVIDIA H100 80GB HBM3","utilization":86,"memory_used_mb":10323,"memory_total_mb":81559,"temperature":41}],
+  "cpu": {"cores": 24, "load_avg": 2.64, "usage_percent": 5.7},
+  "memory": {"used_mb": 13551, "total_mb": 241600, "percent": 5.6},
   "disk": {"used": "923G", "total": "993G", "percent": 93},
   "users": ["ispl"],
-  "gpu_processes": [{"pid":1972192,"name":"/home/ispl/anaconda3/envs/scaffold_gs/bin/DH_APGS_v10a_RAGGED_drj_s0","memory_mb":8614},{"pid":2033664,"name":"/home/ispl/anaconda3/envs/pnm_ugs/bin/DH_FuseGS_v00lite_bns","memory_mb":9748}]
+  "gpu_processes": [{"pid":2033664,"name":"/home/ispl/anaconda3/envs/pnm_ugs/bin/DH_FuseGS_v00lite_bns","memory_mb":10314}]
 },
     {
   "name": "ISPL",
   "type": "gpu",
   "status": "online",
-  "timestamp": "2026-05-16T14:28:31Z",
+  "timestamp": "2026-05-16T14:43:59Z",
   "gpu_count": 8,
   "gpu_memory_gb": 48,
-  "gpus": [{"index":0,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":25},{"index":1,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":25},{"index":2,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":24},{"index":3,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":26},{"index":4,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":27},{"index":5,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":27},{"index":6,"name":"NVIDIA RTX A6000","utilization":99,"memory_used_mb":15393,"memory_total_mb":49140,"temperature":63},{"index":7,"name":"NVIDIA RTX A6000","utilization":97,"memory_used_mb":12195,"memory_total_mb":49140,"temperature":48}],
-  "cpu": {"cores": 48, "load_avg": 12.76, "usage_percent": 3.2},
-  "memory": {"used_mb": 74755, "total_mb": 709363, "percent": 10.5},
+  "gpus": [{"index":0,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":25},{"index":1,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":25},{"index":2,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":25},{"index":3,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":26},{"index":4,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":27},{"index":5,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":10,"memory_total_mb":49140,"temperature":27},{"index":6,"name":"NVIDIA RTX A6000","utilization":99,"memory_used_mb":15455,"memory_total_mb":49140,"temperature":61},{"index":7,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":16921,"memory_total_mb":49140,"temperature":51}],
+  "cpu": {"cores": 48, "load_avg": 12.33, "usage_percent": 2.1},
+  "memory": {"used_mb": 74966, "total_mb": 709363, "percent": 10.6},
   "disk": {"used": "2.3T", "total": "3.6T", "percent": 65},
   "users": ["ispl"],
-  "gpu_processes": [{"pid":2675681,"name":"/home/ispl/anaconda3/envs/amgs_clean/bin/YH_AMGS_v42msgs","memory_mb":15378},{"pid":3053138,"name":"/home/ispl/anaconda3/envs/amgs_clean/bin/YH_AMGS_v42msgs","memory_mb":12076}]
+  "gpu_processes": [{"pid":2675681,"name":"/home/ispl/anaconda3/envs/amgs_clean/bin/YH_AMGS_v42msgs","memory_mb":15440},{"pid":3053138,"name":"/home/ispl/anaconda3/envs/amgs_clean/bin/YH_AMGS_v42msgs","memory_mb":17330}]
 },
     {
   "name": "CPU1",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-05-16T14:28:31Z",
-  "cpu": {"cores": 64, "load_avg": 0.08, "usage_percent": 0.1},
-  "memory": {"used_mb": 4462, "total_mb": 773344, "percent": 0.6},
+  "timestamp": "2026-05-16T14:43:59Z",
+  "cpu": {"cores": 64, "load_avg": 0.00, "usage_percent": 0.1},
+  "memory": {"used_mb": 4465, "total_mb": 773344, "percent": 0.6},
   "disk": {"used": "35G", "total": "879G", "percent": 5},
   "users": []
 },
@@ -43,9 +43,9 @@
   "name": "CPU2",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-05-16T14:28:31Z",
-  "cpu": {"cores": 64, "load_avg": 0.10, "usage_percent": 0.2},
-  "memory": {"used_mb": 6202, "total_mb": 773344, "percent": 0.8},
+  "timestamp": "2026-05-16T14:43:59Z",
+  "cpu": {"cores": 64, "load_avg": 0.09, "usage_percent": 0.2},
+  "memory": {"used_mb": 6186, "total_mb": 773344, "percent": 0.8},
   "disk": {"used": "47G", "total": "879G", "percent": 6},
   "users": ["user"]
 },
@@ -53,9 +53,9 @@
   "name": "CPU3",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-05-16T14:28:31Z",
+  "timestamp": "2026-05-16T14:43:59Z",
   "cpu": {"cores": 64, "load_avg": 4.15, "usage_percent": 6.3},
-  "memory": {"used_mb": 16095, "total_mb": 773344, "percent": 2.1},
+  "memory": {"used_mb": 16117, "total_mb": 773344, "percent": 2.1},
   "disk": {"used": "36G", "total": "879G", "percent": 5},
   "users": ["user"]
 },
@@ -63,9 +63,9 @@
   "name": "CPU4",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-05-16T14:28:31Z",
-  "cpu": {"cores": 64, "load_avg": 40.08, "usage_percent": 62.5},
-  "memory": {"used_mb": 137578, "total_mb": 773344, "percent": 17.8},
+  "timestamp": "2026-05-16T14:43:59Z",
+  "cpu": {"cores": 64, "load_avg": 40.38, "usage_percent": 62.7},
+  "memory": {"used_mb": 137681, "total_mb": 773344, "percent": 17.8},
   "disk": {"used": "164G", "total": "879G", "percent": 20},
   "users": ["user"]
 }
