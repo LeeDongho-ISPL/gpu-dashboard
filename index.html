@@ -118,6 +118,105 @@ body {
 /* ============================== */
 .schedule-section { display: none; }
 .schedule-section.active { display: block; }
+
+/* ====== Conference Calendar Tab (cc- namespace) ====== */
+.confcal-section { display: none; }
+.confcal-section.active { display: block; }
+#confcalSection { --cc-cv:#4da3ff; --cc-ml:#a78bfa; --cc-gfx:#fb923c; --cc-d3:#22d3ee;
+  --cc-pass:#5a6172; --cc-up:var(--green); --cc-proj:var(--yellow); }
+.cc-note { background: var(--card); border:1px solid var(--border); border-left:3px solid var(--yellow);
+  border-radius:10px; padding:11px 14px; font-size:12.5px; color:var(--text-dim); margin-bottom:18px; line-height:1.5; }
+.cc-note b { color:var(--text); }
+.cc-note .est { color:var(--yellow); font-style:italic; }
+.cc-toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px; }
+.cc-nav { display:flex; align-items:center; gap:8px; }
+.cc-navbtn { background:var(--card); border:1px solid var(--border); color:var(--text); border-radius:8px;
+  width:34px; height:34px; font-size:16px; cursor:pointer; }
+.cc-navbtn:hover { border-color:var(--accent); }
+.cc-title { font-size:19px; font-weight:700; min-width:150px; text-align:center; }
+.cc-todaybtn { background:var(--card); border:1px solid var(--border); color:var(--text-dim);
+  border-radius:8px; padding:7px 13px; font-size:12.5px; cursor:pointer; }
+.cc-todaybtn:hover { border-color:var(--accent); color:var(--text); }
+.cc-yjump { display:flex; gap:5px; margin-left:auto; }
+.cc-ychip { background:var(--card); border:1px solid var(--border); color:var(--text-dim);
+  border-radius:7px; padding:6px 11px; font-size:12.5px; cursor:pointer; }
+.cc-ychip:hover { border-color:var(--accent); color:var(--text); }
+.cc-ychip.cur { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700; }
+.cc-filters { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:12px; }
+.cc-lbl { font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-dim); margin:0 4px; }
+.cc-chip { background:var(--card); border:1px solid var(--border); color:var(--text-dim);
+  border-radius:999px; padding:5px 11px; font-size:12px; cursor:pointer; user-select:none; transition:.12s; }
+.cc-chip:hover { color:var(--text); }
+.cc-chip.on { color:#fff; font-weight:600; }
+.cc-chip.on.cv { background:var(--cc-cv); border-color:var(--cc-cv); }
+.cc-chip.on.ml { background:var(--cc-ml); border-color:var(--cc-ml); }
+.cc-chip.on.gfx { background:var(--cc-gfx); border-color:var(--cc-gfx); }
+.cc-chip.on.d3 { background:var(--cc-d3); border-color:var(--cc-d3); }
+.cc-chip.on.st { background:#cdd9e3; border-color:#cdd9e3; color:#11151f; }
+.cc-legend { display:flex; flex-wrap:wrap; gap:16px; font-size:12px; color:var(--text-dim); margin-bottom:10px; }
+.cc-legend .lg { display:flex; align-items:center; gap:6px; }
+.cc-sw { width:22px; height:12px; border-radius:3px; display:inline-block; }
+.cc-sw.pass { background:repeating-linear-gradient(45deg,var(--border),var(--border) 3px,var(--card) 3px,var(--card) 6px); }
+.cc-sw.up { background:var(--green); }
+.cc-sw.proj { background:var(--yellow); opacity:.85; }
+table.cc-cal { width:100%; border-collapse:collapse; table-layout:fixed; }
+table.cc-cal th { font-size:11.5px; color:var(--text-dim); font-weight:600; padding:8px 0; text-align:center; }
+table.cc-cal th.cc-sun { color:var(--red); } table.cc-cal th.cc-sat { color:#38bdf8; }
+table.cc-cal td { border:1px solid var(--border); height:116px; vertical-align:top; padding:5px 5px 4px;
+  background:var(--card); }
+table.cc-cal td.cc-blank { background:var(--bg); border-color:var(--border); }
+.cc-dnum { font-size:12px; color:var(--text-dim); font-weight:600; margin-bottom:3px; }
+table.cc-cal td.cc-today { background:var(--card-hover); border-color:var(--yellow); }
+table.cc-cal td.cc-today .cc-dnum { color:var(--yellow); }
+.cc-evt { display:block; font-size:11px; font-weight:600; border-radius:5px; padding:3px 6px; margin-bottom:3px;
+  cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-left:3px solid; }
+.cc-evt:hover { filter:brightness(1.18); }
+.cc-evt.cv { background:rgba(77,163,255,.16); border-color:var(--cc-cv); color:#bcdcff; }
+.cc-evt.ml { background:rgba(167,139,250,.18); border-color:var(--cc-ml); color:#ddd0ff; }
+.cc-evt.gfx { background:rgba(251,146,60,.16); border-color:var(--cc-gfx); color:#ffd6b3; }
+.cc-evt.d3 { background:rgba(34,211,238,.16); border-color:var(--cc-d3); color:#b3eef7; }
+.cc-evt.passed { opacity:.4; font-weight:500; }
+.cc-evt.projected { border-left-style:dashed; }
+.cc-evt .yr { opacity:.7; font-weight:400; }
+.cc-evt .pj { font-style:italic; }
+#cc-detail { margin-top:16px; background:var(--card); border:1px solid var(--border); border-radius:10px; display:none; overflow:hidden; }
+#cc-detail.show { display:block; }
+.cc-dhead { padding:13px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+.cc-dhead .vn { font-size:16px; font-weight:700; }
+.cc-dbody { padding:6px 16px 14px; }
+.cc-drow { display:flex; gap:10px; padding:7px 0; border-bottom:1px solid var(--border); font-size:13px; }
+.cc-drow:last-child { border-bottom:none; }
+.cc-dk { color:var(--text-dim); width:96px; flex:none; }
+.cc-dv .big { font-size:15px; font-weight:700; color:var(--accent); }
+.cc-badge { display:inline-block; font-size:10.5px; font-weight:700; padding:2px 9px; border-radius:999px; }
+.cc-badge.passed { background:rgba(90,97,114,.18); color:var(--cc-pass); border:1px solid var(--border); }
+.cc-badge.upcoming { background:rgba(52,211,153,.14); color:var(--green); border:1px solid rgba(52,211,153,.4); }
+.cc-badge.projected { background:rgba(251,191,36,.12); color:var(--yellow); border:1px solid rgba(251,191,36,.4); }
+.cc-est { color:var(--yellow); font-style:italic; }
+@media (max-width:680px){ table.cc-cal td{ height:90px; } .cc-evt{ font-size:10px; padding:2px 4px; } }
+.cc-viewtoggle { display:flex; gap:3px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:3px; }
+.cc-vbtn { padding:7px 16px; border:none; background:none; color:var(--text-dim); font-size:13px; font-weight:600;
+  border-radius:7px; cursor:pointer; }
+.cc-vbtn.active { background:var(--accent); color:#fff; }
+.cc-yearblock { margin-top:22px; }
+.cc-yearhead { display:flex; align-items:baseline; gap:12px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+.cc-yearhead h3 { font-size:18px; font-weight:700; }
+.cc-yearhead .cnt { font-size:12px; color:var(--text-dim); }
+table.cc-list { width:100%; border-collapse:collapse; font-size:13px; }
+table.cc-list th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--text-dim);
+  font-weight:600; padding:9px 10px 7px; border-bottom:1px solid var(--border); }
+table.cc-list td { padding:10px; border-bottom:1px solid var(--border); vertical-align:top; }
+table.cc-list tr.crow{ cursor:pointer; }
+table.cc-list tr.crow:hover td { background:var(--card-hover); }
+table.cc-list tr.passed { opacity:.52; }
+.cc-venue { font-weight:700; white-space:nowrap; }
+.cc-vtag { display:inline-block; font-size:10px; padding:1px 7px; border-radius:5px; margin-left:7px; font-weight:600; }
+.cc-vtag.cv{ background:rgba(77,163,255,.16); color:var(--cc-cv);} .cc-vtag.ml{ background:rgba(167,139,250,.18); color:var(--cc-ml);}
+.cc-vtag.gfx{ background:rgba(251,146,60,.16); color:var(--cc-gfx);} .cc-vtag.d3{ background:rgba(34,211,238,.16); color:var(--cc-d3);}
+.cc-ddl { font-weight:600; white-space:nowrap; }
+.cc-sub { color:var(--text-dim); font-size:11.5px; margin-top:2px; }
+.cc-cd { font-size:11.5px; color:var(--green); font-weight:600; margin-top:2px; }
+.cc-empty { padding:30px; text-align:center; color:var(--text-dim); }
 .monitor-section { display: none; }
 .monitor-section.active { display: block; }
 
@@ -416,6 +515,7 @@ body {
     <div class="tabs" style="margin-bottom:0;">
       <button class="tab active" onclick="switchTab('monitor')">서버 모니터링</button>
       <button class="tab" onclick="switchTab('schedule')">스케줄 관리</button>
+      <button class="tab" onclick="switchTab('confcal')">학회 캘린더</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
       <label style="font-size:12px;color:var(--text-dim);">시간대:</label>
@@ -536,6 +636,59 @@ body {
       </div>
     </div>
   </div>
+
+  <!-- ====== Conference Calendar Tab ====== -->
+  <div class="confcal-section" id="confcalSection">
+    <div class="cc-note">
+      ⚠ <b>확정 vs 추정</b> — 학회는 보통 6~12개월 전에만 날짜를 공식 공지한다. 2026 및 2027 일부는 <b>공식 확정값</b>, 그 이후·미공지 항목은 <span class="est">기울임·점선·'~' 표기의 추정값</span>(직전 사이클 패턴 투영, 비공식)이다. <b>ICCV=홀수해 / ECCV=짝수해</b>만 존재. 투고 전 공식 사이트 재확인 필수.
+    </div>
+
+    <div class="cc-toolbar">
+      <div class="cc-viewtoggle">
+        <button class="cc-vbtn active" id="ccViewCal" onclick="ccSetView('cal')">📅 달력</button>
+        <button class="cc-vbtn" id="ccViewList" onclick="ccSetView('list')">📋 리스트</button>
+      </div>
+      <div class="cc-nav" id="ccMonthNav">
+        <button class="cc-navbtn" onclick="ccStep(-1)">‹</button>
+        <div class="cc-title" id="ccTitle">—</div>
+        <button class="cc-navbtn" onclick="ccStep(1)">›</button>
+        <button class="cc-todaybtn" onclick="ccToday()">오늘로</button>
+      </div>
+      <div class="cc-yjump" id="ccYjump"></div>
+    </div>
+
+    <div class="cc-filters">
+      <span class="cc-lbl">분야</span>
+      <span class="cc-chip on cv" data-cat="cv">Vision</span>
+      <span class="cc-chip on ml" data-cat="ml">ML</span>
+      <span class="cc-chip on gfx" data-cat="gfx">Graphics</span>
+      <span class="cc-chip on d3" data-cat="d3">3D</span>
+      <span class="cc-lbl" style="margin-left:10px">상태</span>
+      <span class="cc-chip on st" data-st="passed">지난</span>
+      <span class="cc-chip on st" data-st="upcoming">남음</span>
+      <span class="cc-chip on st" data-st="projected">추정</span>
+    </div>
+
+    <div class="cc-legend">
+      <span class="lg"><span class="cc-sw pass"></span>지난 마감</span>
+      <span class="lg"><span class="cc-sw up"></span>남은 마감(확정)</span>
+      <span class="lg"><span class="cc-sw proj"></span>추정(미공지)</span>
+    </div>
+
+    <!-- Calendar view -->
+    <div id="ccCalWrap">
+      <table class="cc-cal">
+        <thead><tr>
+          <th class="cc-sun">일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th class="cc-sat">토</th>
+        </tr></thead>
+        <tbody id="ccGrid"></tbody>
+      </table>
+    </div>
+    <!-- List view -->
+    <div id="ccListWrap" style="display:none;"></div>
+
+    <div id="cc-detail"></div>
+  </div>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
@@ -620,10 +773,12 @@ function switchTab(tab) {
   event.target.classList.add('active');
   document.getElementById('monitorSection').classList.toggle('active', tab === 'monitor');
   document.getElementById('scheduleSection').classList.toggle('active', tab === 'schedule');
+  document.getElementById('confcalSection').classList.toggle('active', tab === 'confcal');
   if (tab === 'schedule') {
     renderCalendar();
     renderGpuAvailability();
   }
+  if (tab === 'confcal') { renderConfCal(); }
 }
 
 // ============================
@@ -1469,5 +1624,194 @@ if (sessionStorage.getItem('ispl_dash_auth') === 'true') {
 }
 </script>
 </div><!-- end dashboard-content -->
+<script>
+// ============================================================
+// Conference Calendar (학회 마감 캘린더) — cc/CC namespace, isolated
+// ============================================================
+const CC_DATA = [
+  {venue:"3DV", type:"d3", year:2026, ddl:"2025-08-18", abs:"2025-08-21 (supp)", conf:"2026.3.20–23", loc:"Vancouver, CA", cfd:"confirmed"},
+  {venue:"AAAI", type:"ml", year:2026, ddl:"2025-08-15", abs:"2025-08-08", conf:"2026.1", loc:"Singapore", cfd:"confirmed"},
+  {venue:"ICLR", type:"ml", year:2026, ddl:"2025-09-24", abs:"—", conf:"2026.4", loc:"Rio, BR", cfd:"confirmed"},
+  {venue:"CVPR", type:"cv", year:2026, ddl:"2025-11-14", abs:"2025-11-07", conf:"2026.6", loc:"Denver, US", cfd:"confirmed"},
+  {venue:"SIGGRAPH", type:"gfx", year:2026, ddl:"2026-01-22", abs:"form 2026-01-15", conf:"2026.8", loc:"Los Angeles, US", cfd:"confirmed"},
+  {venue:"ICML", type:"ml", year:2026, ddl:"2026-01-28", abs:"2026-01-22", conf:"2026.7", loc:"Seoul, KR", cfd:"confirmed"},
+  {venue:"ECCV", type:"cv", year:2026, ddl:"2026-03-06", abs:"~2026-02-27", conf:"2026.9.8–12", loc:"Malmö, SE", cfd:"confirmed"},
+  {venue:"NeurIPS", type:"ml", year:2026, ddl:"2026-05-06", abs:"2026-05-04", conf:"2026.12", loc:"San Diego, US", cfd:"confirmed"},
+  {venue:"SIGGRAPH Asia", type:"gfx", year:2026, ddl:"2026-05-12", abs:"stage-1 2026-05-05", conf:"2026.12", loc:"TBD", cfd:"confirmed"},
+  {venue:"AAAI", type:"ml", year:2027, ddl:"2026-07-28", abs:"2026-07-21", conf:"2027.2.16–23", loc:"Montréal, CA", cfd:"confirmed"},
+  {venue:"3DV", type:"d3", year:2027, ddl:"2026-08-18", abs:"~8월말", conf:"2027.3", loc:"TBD", cfd:"projected"},
+  {venue:"ICLR", type:"ml", year:2027, ddl:"2026-09-24", abs:"—", conf:"2027.4.24–28", loc:"TBD", cfd:"confirmed"},
+  {venue:"CVPR", type:"cv", year:2027, ddl:"2026-11-13", abs:"~2026-11-06", conf:"2027.6.19–26", loc:"Seattle, US", cfd:"projected", confOK:true},
+  {venue:"SIGGRAPH", type:"gfx", year:2027, ddl:"2027-01-21", abs:"form ~1월 중순", conf:"2027.8", loc:"TBD", cfd:"projected"},
+  {venue:"ICML", type:"ml", year:2027, ddl:"2027-01-28", abs:"~1월말", conf:"2027.7", loc:"TBD", cfd:"projected"},
+  {venue:"ICCV", type:"cv", year:2027, ddl:"2027-03-08", abs:"~3월 초", conf:"2027.10", loc:"TBD", cfd:"projected"},
+  {venue:"SIGGRAPH Asia", type:"gfx", year:2027, ddl:"2027-05-11", abs:"stage-1 ~5월 초", conf:"2027.12", loc:"TBD", cfd:"projected"},
+  {venue:"NeurIPS", type:"ml", year:2027, ddl:"2027-05-12", abs:"~5월 초", conf:"2027.12", loc:"TBD", cfd:"projected"},
+  {venue:"AAAI", type:"ml", year:2028, ddl:"2027-07-28", abs:"~7월 중순", conf:"2028.2", loc:"TBD", cfd:"projected"},
+  {venue:"3DV", type:"d3", year:2028, ddl:"2027-08-18", abs:"~8월 중순", conf:"2028.3", loc:"TBD", cfd:"projected"},
+  {venue:"ICLR", type:"ml", year:2028, ddl:"2027-09-24", abs:"—", conf:"2028.4", loc:"TBD", cfd:"projected"},
+  {venue:"CVPR", type:"cv", year:2028, ddl:"2027-11-12", abs:"~11월 초", conf:"2028.6", loc:"TBD", cfd:"projected"},
+  {venue:"SIGGRAPH", type:"gfx", year:2028, ddl:"2028-01-20", abs:"form ~1월 중순", conf:"2028.8", loc:"TBD", cfd:"projected"},
+  {venue:"ICML", type:"ml", year:2028, ddl:"2028-01-28", abs:"~1월말", conf:"2028.7", loc:"TBD", cfd:"projected"},
+  {venue:"ECCV", type:"cv", year:2028, ddl:"2028-03-06", abs:"~2월말", conf:"2028.9", loc:"TBD", cfd:"projected"},
+  {venue:"SIGGRAPH Asia", type:"gfx", year:2028, ddl:"2028-05-10", abs:"stage-1 ~5월 초", conf:"2028.12", loc:"TBD", cfd:"projected"},
+  {venue:"NeurIPS", type:"ml", year:2028, ddl:"2028-05-10", abs:"~5월 초", conf:"2028.12", loc:"TBD", cfd:"projected"},
+  {venue:"AAAI", type:"ml", year:2029, ddl:"2028-07-28", abs:"~7월 중순", conf:"2029.2", loc:"TBD", cfd:"projected"},
+  {venue:"3DV", type:"d3", year:2029, ddl:"2028-08-18", abs:"~8월 중순", conf:"2029.3", loc:"TBD", cfd:"projected"},
+  {venue:"ICLR", type:"ml", year:2029, ddl:"2028-09-24", abs:"—", conf:"2029.4", loc:"TBD", cfd:"projected"},
+  {venue:"CVPR", type:"cv", year:2029, ddl:"2028-11-12", abs:"~11월 초", conf:"2029.6", loc:"TBD", cfd:"projected"},
+  {venue:"SIGGRAPH", type:"gfx", year:2029, ddl:"2029-01-18", abs:"form ~1월 중순", conf:"2029.8", loc:"TBD", cfd:"projected"},
+  {venue:"ICML", type:"ml", year:2029, ddl:"2029-01-26", abs:"~1월말", conf:"2029.7", loc:"TBD", cfd:"projected"},
+  {venue:"ICCV", type:"cv", year:2029, ddl:"2029-03-07", abs:"~3월 초", conf:"2029.10", loc:"TBD", cfd:"projected"},
+  {venue:"SIGGRAPH Asia", type:"gfx", year:2029, ddl:"2029-05-09", abs:"stage-1 ~5월 초", conf:"2029.12", loc:"TBD", cfd:"projected"},
+  {venue:"NeurIPS", type:"ml", year:2029, ddl:"2029-05-09", abs:"~5월 초", conf:"2029.12", loc:"TBD", cfd:"projected"},
+];
+const CC_TODAY = new Date();
+const CC_TKEY = CC_TODAY.getFullYear()+"-"+String(CC_TODAY.getMonth()+1).padStart(2,"0")+"-"+String(CC_TODAY.getDate()).padStart(2,"0");
+const CC_MS = 86400000;
+const CC_MIN_Y=2025, CC_MIN_M=7, CC_MAX_Y=2029, CC_MAX_M=11;
+const CC_TYPEKO = {cv:"Vision", ml:"ML", gfx:"Graphics", d3:"3D"};
+let ccView = 'cal';
+let ccY = CC_TODAY.getFullYear(), ccM = CC_TODAY.getMonth();
+if(ccY<CC_MIN_Y||(ccY===CC_MIN_Y&&ccM<CC_MIN_M)){ccY=CC_MIN_Y;ccM=CC_MIN_M;}
+if(ccY>CC_MAX_Y||(ccY===CC_MAX_Y&&ccM>CC_MAX_M)){ccY=CC_MAX_Y;ccM=CC_MAX_M;}
+const ccCat = {cv:1,ml:1,gfx:1,d3:1}, ccSt = {passed:1,upcoming:1,projected:1};
+
+function ccStatusOf(x){
+  const d=new Date(x.ddl+"T23:59:59"); const past=d<CC_TODAY;
+  if(x.cfd==="projected") return past?"passed":"projected";
+  return past?"passed":"upcoming";
+}
+function ccDaysLeft(iso){ return Math.ceil((new Date(iso+"T23:59:59")-CC_TODAY)/CC_MS); }
+function ccYmd(iso){ const a=iso.split("-"); return a[0]+"년 "+(+a[1])+"월 "+(+a[2])+"일"; }
+function ccVisible(x){ return ccCat[x.type] && ccSt[ccStatusOf(x)]; }
+
+function ccBuildYJump(){
+  const box=document.getElementById("ccYjump"); box.innerHTML="";
+  [2026,2027,2028,2029].forEach(y=>{
+    const c=document.createElement("span"); c.className="cc-ychip"+(y===ccY?" cur":"");
+    c.textContent=y; c.onclick=()=>{ ccY=y; if(ccY===CC_MIN_Y&&ccM<CC_MIN_M)ccM=CC_MIN_M; renderConfCal(); };
+    box.appendChild(c);
+  });
+}
+function ccEventsOn(iso){
+  return CC_DATA.filter(x=>x.ddl===iso).filter(ccVisible).sort((a,b)=>a.venue<b.venue?-1:1);
+}
+
+function renderConfCal(){
+  const calOn = ccView==='cal';
+  document.getElementById("ccCalWrap").style.display = calOn?"block":"none";
+  document.getElementById("ccListWrap").style.display = calOn?"none":"block";
+  document.getElementById("ccMonthNav").style.display = calOn?"flex":"none";
+  document.getElementById("ccYjump").style.display = calOn?"flex":"none";
+  document.getElementById("ccViewCal").classList.toggle("active", calOn);
+  document.getElementById("ccViewList").classList.toggle("active", !calOn);
+  if(calOn) ccRenderCal(); else ccRenderList();
+}
+function ccSetView(v){ ccView=v; document.getElementById("cc-detail").className=""; renderConfCal(); }
+function ccStep(delta){
+  let m=ccM+delta, y=ccY;
+  while(m<0){m+=12;y--;} while(m>11){m-=12;y++;}
+  if(y<CC_MIN_Y||(y===CC_MIN_Y&&m<CC_MIN_M)){y=CC_MIN_Y;m=CC_MIN_M;}
+  if(y>CC_MAX_Y||(y===CC_MAX_Y&&m>CC_MAX_M)){y=CC_MAX_Y;m=CC_MAX_M;}
+  ccY=y; ccM=m; renderConfCal();
+}
+function ccToday(){ const t=new Date(); ccY=t.getFullYear(); ccM=t.getMonth();
+  if(ccY<CC_MIN_Y){ccY=CC_MIN_Y;ccM=CC_MIN_M;} if(ccY>CC_MAX_Y){ccY=CC_MAX_Y;ccM=CC_MAX_M;} renderConfCal(); }
+
+function ccRenderCal(){
+  document.getElementById("ccTitle").textContent = ccY+"년 "+(ccM+1)+"월";
+  ccBuildYJump();
+  const grid=document.getElementById("ccGrid"); grid.innerHTML="";
+  const startDow=new Date(ccY,ccM,1).getDay();
+  const dim=new Date(ccY,ccM+1,0).getDate();
+  let cells=[]; for(let i=0;i<startDow;i++)cells.push(null);
+  for(let d=1;d<=dim;d++)cells.push(d);
+  while(cells.length%7)cells.push(null);
+  for(let r=0;r<cells.length;r+=7){
+    const tr=document.createElement("tr");
+    for(let c=0;c<7;c++){
+      const d=cells[r+c]; const td=document.createElement("td");
+      if(d===null){ td.className="cc-blank"; tr.appendChild(td); continue; }
+      const iso=ccY+"-"+String(ccM+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+      if(iso===CC_TKEY) td.className="cc-today";
+      const dn=document.createElement("div"); dn.className="cc-dnum"; dn.textContent=d; td.appendChild(dn);
+      ccEventsOn(iso).forEach(x=>{
+        const st=ccStatusOf(x), proj=x.cfd==="projected";
+        const e=document.createElement("div");
+        e.className="cc-evt "+x.type+" "+st+(proj?" projected":"");
+        e.innerHTML=(proj?'<span class="pj">~</span>':'')+x.venue+' <span class="yr">\''+String(x.year).slice(2)+'</span>';
+        e.title=x.venue+" "+x.year+" — 마감 "+ccYmd(x.ddl)+(proj?" (추정)":"");
+        e.onclick=()=>ccShowDetail(x);
+        td.appendChild(e);
+      });
+      tr.appendChild(td);
+    }
+    grid.appendChild(tr);
+  }
+}
+
+function ccRenderList(){
+  const wrap=document.getElementById("ccListWrap"); wrap.innerHTML="";
+  let total=0;
+  [2026,2027,2028,2029].forEach(yr=>{
+    const rows=CC_DATA.filter(x=>x.year===yr).filter(ccVisible).sort((a,b)=>a.ddl<b.ddl?-1:1);
+    if(!rows.length) return; total+=rows.length;
+    const block=document.createElement("div"); block.className="cc-yearblock";
+    block.innerHTML='<div class="cc-yearhead"><h3>'+yr+'</h3><span class="cnt">'+rows.length+'개 마감</span></div>';
+    const tbl=document.createElement("table"); tbl.className="cc-list";
+    tbl.innerHTML='<thead><tr><th style="width:22%">학회</th><th style="width:21%">논문 마감</th>'+
+      '<th style="width:13%">상태</th><th style="width:21%">개최</th><th style="width:23%">장소</th></tr></thead>';
+    const tb=document.createElement("tbody");
+    rows.forEach(x=>{
+      const st=ccStatusOf(x), proj=x.cfd==="projected";
+      const tr=document.createElement("tr"); tr.className="crow"+(st==="passed"?" passed":"");
+      tr.onclick=()=>ccShowDetail(x);
+      const ddlTxt=(proj?'<span class="cc-ddl cc-est">~':'<span class="cc-ddl">')+ccYmd(x.ddl)+'</span>';
+      const badge = st==="passed"?'<span class="cc-badge passed">지난 마감</span>'
+                  : st==="upcoming"?'<span class="cc-badge upcoming">남음 · D-'+ccDaysLeft(x.ddl)+'</span>'
+                  : '<span class="cc-badge projected">추정</span>';
+      const confTxt=(x.confOK&&proj)?x.conf+' <span style="color:var(--green)">✓</span>'
+                  :(proj?'<span class="cc-est">'+x.conf+'</span>':x.conf);
+      tr.innerHTML='<td><span class="cc-venue">'+x.venue+' '+x.year+'</span><span class="cc-vtag '+x.type+'">'+CC_TYPEKO[x.type]+'</span></td>'+
+        '<td>'+ddlTxt+(x.abs&&x.abs!=="—"?'<div class="cc-sub">abstract: '+x.abs+'</div>':'')+'</td>'+
+        '<td>'+badge+'</td>'+
+        '<td style="color:var(--text-dim)">'+confTxt+'</td>'+
+        '<td style="color:var(--text-dim)">'+x.loc+'</td>';
+      tb.appendChild(tr);
+    });
+    tbl.appendChild(tb); block.appendChild(tbl); wrap.appendChild(block);
+  });
+  if(!total) wrap.innerHTML='<div class="cc-empty">선택된 필터에 해당하는 마감이 없습니다.</div>';
+}
+
+function ccShowDetail(x){
+  const st=ccStatusOf(x), proj=x.cfd==="projected";
+  const badge = st==="passed"?'<span class="cc-badge passed">지난 마감</span>'
+              : st==="upcoming"?'<span class="cc-badge upcoming">남음 · D-'+ccDaysLeft(x.ddl)+'</span>'
+              : '<span class="cc-badge projected">추정(미공지)</span>';
+  const ddlDisp=(proj?'<span class="cc-est">~ ':'<span>')+ccYmd(x.ddl)+'</span>';
+  const confDisp=x.confOK?x.conf+' <span style="color:var(--green)">✓확정</span>'
+               :(proj?'<span class="cc-est">'+x.conf+' (추정)</span>':x.conf);
+  const d=document.getElementById("cc-detail"); d.className="show";
+  d.innerHTML='<div class="cc-dhead"><span class="vn">'+x.venue+' '+x.year+'</span>'+badge+
+      '<span style="margin-left:auto;color:var(--text-dim);font-size:12px">'+CC_TYPEKO[x.type]+'</span></div>'+
+    '<div class="cc-dbody">'+
+      '<div class="cc-drow"><span class="cc-dk">논문 마감</span><span class="cc-dv"><span class="big">'+ddlDisp+'</span></span></div>'+
+      '<div class="cc-drow"><span class="cc-dk">Abstract</span><span class="cc-dv">'+x.abs+'</span></div>'+
+      '<div class="cc-drow"><span class="cc-dk">개최</span><span class="cc-dv">'+confDisp+'</span></div>'+
+      '<div class="cc-drow"><span class="cc-dk">장소</span><span class="cc-dv">'+x.loc+'</span></div>'+
+      '<div class="cc-drow"><span class="cc-dk">신뢰도</span><span class="cc-dv">'+(proj?'<span class="cc-est">추정 — 직전 사이클 패턴 투영(비공식)</span>':'공식 확정값')+'</span></div>'+
+    '</div>';
+  d.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+document.querySelectorAll('#confcalSection .cc-chip[data-cat]').forEach(function(c){ c.onclick=function(){
+  const k=c.dataset.cat; ccCat[k]=!ccCat[k]; c.classList.toggle("on"); renderConfCal();
+};});
+document.querySelectorAll('#confcalSection .cc-chip[data-st]').forEach(function(c){ c.onclick=function(){
+  const k=c.dataset.st; ccSt[k]=!ccSt[k]; c.classList.toggle("on"); renderConfCal();
+};});
+</script>
 </body>
 </html>
