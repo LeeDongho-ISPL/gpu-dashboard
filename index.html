@@ -445,6 +445,17 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
 .login-box .error { color: var(--red); font-size: 12px; margin-top: 8px; display: none; }
 .dashboard-content { display: none; }
 .dashboard-content.unlocked { display: block; }
+
+/* journal guideline view */
+.jr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
+.jr-card{background:var(--card,#171a26);border:1px solid var(--border,#2a2e3d);border-radius:10px;padding:14px}
+.jr-ab{font-weight:700;font-size:15px;color:var(--accent,#6c7aff)}
+.jr-full{font-size:12.5px;margin-top:2px;line-height:1.35}
+.jr-soc{font-size:11px;opacity:.6;margin:3px 0 9px}
+.jr-links{display:flex;flex-direction:column;gap:6px}
+.jr-links a,.jr-common a{color:var(--accent,#6c7aff);text-decoration:none;font-size:12.5px}
+.jr-links a:hover,.jr-common a:hover{text-decoration:underline}
+.jr-common{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border,#2a2e3d)}
 </style>
 </head>
 <body>
@@ -610,8 +621,8 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
 
     <div class="cc-bar">
       <div class="cc-seg">
-        <button class="active" id="ccViewCal" onclick="ccSetView('cal')">달력</button>
-        <button id="ccViewList" onclick="ccSetView('list')">리스트</button>
+        <button class="active" id="ccViewList" onclick="ccSetView('list')">컨퍼런스</button>
+        <button id="ccViewJournal" onclick="ccSetView('journal')">저널 양식</button>
       </div>
       <div class="cc-yjump" id="ccYjump"></div>
     </div>
@@ -645,6 +656,7 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
     </div>
     <!-- List view -->
     <div id="ccListWrap" style="display:none;"></div>
+    <div id="ccJournalWrap" style="display:none;"></div>
 
     <div id="cc-detail"></div>
   </div>
@@ -1634,7 +1646,7 @@ function ccPad(n){ return String(n).padStart(2,"0"); }
 function ccKey(d){ return d.getFullYear()+"-"+ccPad(d.getMonth()+1)+"-"+ccPad(d.getDate()); }
 const CC_TKEY = ccKey(CC_TODAY);
 const CC_MIN_Y=2025, CC_MIN_M=7, CC_MAX_Y=2029, CC_MAX_M=11;
-let ccView = "cal";
+let ccView = "list";
 const ccCat = {cv:1,ml:1,gfx:1,d3:1}, ccSt = {passed:1,upcoming:1,projected:1};
 let ccY, ccM;
 (function ccInit(){
@@ -1666,14 +1678,50 @@ function ccBuildYJump(){
   });
 }
 
+function renderJournalGuides(){
+  var W=document.getElementById("ccJournalWrap"); if(!W) return;
+  var J=[
+    {ab:"TIP", full:"IEEE Trans. on Image Processing", soc:"IEEE Signal Processing Society", links:[
+      {t:"저널 홈 · Information for Authors", u:"https://signalprocessingsociety.org/publications-resources/ieee-transactions-image-processing"},
+      {t:"SPS 공통 저자 안내", u:"https://signalprocessingsociety.org/publications-resources/information-authors"}]},
+    {ab:"TMM", full:"IEEE Trans. on Multimedia", soc:"IEEE Signal Processing Society", links:[
+      {t:"저널 홈 · Information for Authors", u:"https://signalprocessingsociety.org/publications-resources/ieee-transactions-multimedia"},
+      {t:"SPS 공통 저자 안내", u:"https://signalprocessingsociety.org/publications-resources/information-authors"}]},
+    {ab:"TCSVT", full:"IEEE Trans. on Circuits and Systems for Video Technology", soc:"IEEE Circuits and Systems Society", links:[
+      {t:"Guidelines for Authors", u:"https://ieee-cas.org/publication/tcsvt/guidelines-authors"},
+      {t:"Manuscript Submission Guide", u:"https://ieee-cas.org/publication/tcsvt/tcsvt-manuscript-submission-guide"}]},
+    {ab:"TPAMI", full:"IEEE Trans. on Pattern Analysis and Machine Intelligence", soc:"IEEE Computer Society", links:[
+      {t:"Author Information", u:"https://www.computer.org/tpami-author-information"}]},
+    {ab:"TVCG", full:"IEEE Trans. on Visualization and Computer Graphics", soc:"IEEE Computer Society", links:[
+      {t:"저널 홈 (CSDL)", u:"https://www.computer.org/csdl/journal/tg"}]}
+  ];
+  var COMMON=[
+    {t:"IEEE Template Selector (LaTeX · Word)", u:"https://template-selector.ieee.org/"},
+    {t:"IEEE Author Center", u:"https://ieeeauthorcenter.ieee.org/"}
+  ];
+  var h='<div class="cc-note">공식 author guideline 링크 모음. 투고 직전 페이지수·템플릿 버전은 반드시 공식 사이트에서 재확인.</div>';
+  h+='<div class="jr-grid">';
+  J.forEach(function(j){
+    h+='<div class="jr-card"><div class="jr-ab">'+j.ab+'</div><div class="jr-full">'+j.full+'</div><div class="jr-soc">'+j.soc+'</div><div class="jr-links">';
+    j.links.forEach(function(l){ h+='<a href="'+l.u+'" target="_blank" rel="noopener">'+l.t+' ↗</a>'; });
+    h+='</div></div>';
+  });
+  h+='</div><div class="jr-common"><span class="cc-lbl">공통 양식</span>';
+  COMMON.forEach(function(l){ h+='<a href="'+l.u+'" target="_blank" rel="noopener">'+l.t+' ↗</a>'; });
+  h+='</div>';
+  W.innerHTML=h;
+}
+
 function renderConfCal(){
-  var calOn = ccView==="cal";
-  document.getElementById("ccCalWrap").style.display = calOn?"block":"none";
-  document.getElementById("ccListWrap").style.display = calOn?"none":"block";
-  document.getElementById("ccYjump").style.display = calOn?"flex":"none";
-  document.getElementById("ccViewCal").classList.toggle("active", calOn);
-  document.getElementById("ccViewList").classList.toggle("active", !calOn);
-  if(calOn) ccRenderCal(); else ccRenderList();
+  var v = (ccView==="journal")?"journal":"list";
+  document.getElementById("ccCalWrap").style.display = "none";
+  document.getElementById("ccListWrap").style.display = (v==="list")?"block":"none";
+  var jw=document.getElementById("ccJournalWrap"); if(jw) jw.style.display=(v==="journal")?"block":"none";
+  var yj=document.getElementById("ccYjump"); if(yj) yj.style.display="none";
+  var flt=document.querySelector("#confcalSection .cc-filters"); if(flt) flt.style.display=(v==="list")?"flex":"none";
+  var bl=document.getElementById("ccViewList"); if(bl) bl.classList.toggle("active", v==="list");
+  var bj=document.getElementById("ccViewJournal"); if(bj) bj.classList.toggle("active", v==="journal");
+  if(v==="list") ccRenderList(); else renderJournalGuides();
 }
 function ccSetView(v){ ccView=v; var d=document.getElementById("cc-detail"); d.className=""; renderConfCal(); }
 function ccStep(delta){
