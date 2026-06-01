@@ -456,6 +456,34 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
 .jr-links a,.jr-common a{color:var(--accent,#6c7aff);text-decoration:none;font-size:12.5px}
 .jr-links a:hover,.jr-common a:hover{text-decoration:underline}
 .jr-common{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border,#2a2e3d)}
+
+/* journal quartile view + template downloads */
+.jr-qsec{margin-top:18px}
+.jr-qhead{display:flex;align-items:center;gap:8px;margin:6px 0 10px}
+.jr-qbadge{padding:2px 11px;border-radius:999px;font-size:13px;font-weight:700;color:#fff}
+.jr-qbadge.q1{background:#16a34a}
+.jr-qbadge.q2{background:#0ea5e9}
+.jr-qcount{font-size:12px;opacity:.6}
+.jr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.jr-card{background:var(--card,#171a26);border:1px solid var(--border,#2a2e3d);border-radius:10px;padding:13px}
+.jr-top{display:flex;align-items:center;justify-content:space-between}
+.jr-ab{font-weight:700;font-size:15px;color:var(--accent,#6c7aff)}
+.jr-q{font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;color:#fff}
+.jr-q.q1{background:#16a34a}.jr-q.q2{background:#0ea5e9}
+.jr-full{font-size:12.5px;margin-top:4px;line-height:1.35}
+.jr-soc{font-size:11px;opacity:.6;margin:3px 0 8px}
+.jr-toggle{width:100%;background:transparent;border:1px solid var(--border,#2a2e3d);color:var(--text,#e5e7eb);border-radius:7px;padding:6px 9px;font-size:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.jr-toggle:hover{border-color:var(--accent,#6c7aff)}
+.jr-arr{transition:transform .15s}
+.jr-card.open .jr-arr{transform:rotate(180deg)}
+.jr-panel{display:none;margin-top:8px;flex-direction:column;gap:6px}
+.jr-card.open .jr-panel{display:flex}
+.jr-dl{display:block;text-align:center;background:var(--accent,#6c7aff);color:#fff !important;text-decoration:none;border-radius:7px;padding:7px;font-size:12.5px;font-weight:600}
+.jr-dl:hover{filter:brightness(1.12)}
+.jr-lnk{color:var(--accent,#6c7aff);text-decoration:none;font-size:12px}
+.jr-lnk:hover{text-decoration:underline}
+.cc-dl{display:inline-block;margin-left:8px;font-size:10.5px;color:var(--accent,#6c7aff);text-decoration:none;border:1px solid var(--border,#2a2e3d);border-radius:6px;padding:1px 6px;white-space:nowrap;vertical-align:middle}
+.cc-dl:hover{border-color:var(--accent,#6c7aff)}
 </style>
 </head>
 <body>
@@ -1678,40 +1706,56 @@ function ccBuildYJump(){
   });
 }
 
+function jrToggle(b){ b.parentNode.classList.toggle("open"); }
+function ccTplLink(kind,name){
+  var key=String(name).toLowerCase().replace(/[^a-z0-9]+/g,'');
+  return '<a class="cc-dl" href="templates/'+kind+'/'+key+'.zip" download title="양식 다운로드: '+name+'" onclick="event.stopPropagation()">⬇ 양식</a>';
+}
 function renderJournalGuides(){
   var W=document.getElementById("ccJournalWrap"); if(!W) return;
+  var IEEE_TPL="https://template-selector.ieee.org/secure/templateSelector/publicationType";
+  var MDPI_TPL="https://www.mdpi.com/authors/layout";
+  var ELS_TPL="https://www.elsevier.com/researcher/author/policies-and-guidelines/latex-instructions";
   var J=[
-    {ab:"TIP", full:"IEEE Trans. on Image Processing", soc:"IEEE Signal Processing Society", links:[
-      {t:"저널 홈 · Information for Authors", u:"https://signalprocessingsociety.org/publications-resources/ieee-transactions-image-processing"},
-      {t:"SPS 공통 저자 안내", u:"https://signalprocessingsociety.org/publications-resources/information-authors"}]},
-    {ab:"TMM", full:"IEEE Trans. on Multimedia", soc:"IEEE Signal Processing Society", links:[
-      {t:"저널 홈 · Information for Authors", u:"https://signalprocessingsociety.org/publications-resources/ieee-transactions-multimedia"},
-      {t:"SPS 공통 저자 안내", u:"https://signalprocessingsociety.org/publications-resources/information-authors"}]},
-    {ab:"TCSVT", full:"IEEE Trans. on Circuits and Systems for Video Technology", soc:"IEEE Circuits and Systems Society", links:[
-      {t:"Guidelines for Authors", u:"https://ieee-cas.org/publication/tcsvt/guidelines-authors"},
-      {t:"Manuscript Submission Guide", u:"https://ieee-cas.org/publication/tcsvt/tcsvt-manuscript-submission-guide"}]},
-    {ab:"TPAMI", full:"IEEE Trans. on Pattern Analysis and Machine Intelligence", soc:"IEEE Computer Society", links:[
-      {t:"Author Information", u:"https://www.computer.org/tpami-author-information"}]},
-    {ab:"TVCG", full:"IEEE Trans. on Visualization and Computer Graphics", soc:"IEEE Computer Society", links:[
-      {t:"저널 홈 (CSDL)", u:"https://www.computer.org/csdl/journal/tg"}]}
+    {ab:"TPAMI", full:"IEEE Trans. on Pattern Analysis and Machine Intelligence", pub:"IEEE Computer Society", q:"Q1", jif:"20.8", key:"tpami", guide:"https://www.computer.org/tpami-author-information", tpl:IEEE_TPL},
+    {ab:"TIP", full:"IEEE Trans. on Image Processing", pub:"IEEE Signal Processing Society", q:"Q1", jif:"13.3", key:"tip", guide:"https://signalprocessingsociety.org/publications-resources/ieee-transactions-image-processing", tpl:IEEE_TPL},
+    {ab:"TCSVT", full:"IEEE Trans. on Circuits and Systems for Video Technology", pub:"IEEE Circuits and Systems Society", q:"Q1", jif:"12.6", key:"tcsvt", guide:"https://ieee-cas.org/publication/tcsvt/guidelines-authors", tpl:IEEE_TPL},
+    {ab:"T-IV", full:"IEEE Trans. on Intelligent Vehicles", pub:"IEEE", q:"Q1", jif:"14.3", key:"tiv", guide:"https://ieeeaccess.ieee.org/", tpl:IEEE_TPL},
+    {ab:"TMM", full:"IEEE Trans. on Multimedia", pub:"IEEE Signal Processing Society", q:"Q1", jif:"8.9", key:"tmm", guide:"https://signalprocessingsociety.org/publications-resources/ieee-transactions-multimedia", tpl:IEEE_TPL},
+    {ab:"TVCG", full:"IEEE Trans. on Visualization and Computer Graphics", pub:"IEEE Computer Society", q:"Q1", jif:"6.6", key:"tvcg", guide:"https://www.computer.org/csdl/journal/tg", tpl:IEEE_TPL},
+    {ab:"ACM TOG", full:"ACM Trans. on Graphics", pub:"ACM", q:"Q1", jif:"7.8", key:"tog", guide:"https://dl.acm.org/journal/tog", tpl:"https://www.acm.org/publications/authors/submissions"},
+    {ab:"IJCV", full:"International Journal of Computer Vision", pub:"Springer", q:"Q1", jif:"9.3", key:"ijcv", guide:"https://link.springer.com/journal/11263/submission-guidelines", tpl:"https://www.springernature.com/gp/authors/campaigns/latex-author-support"},
+    {ab:"PR", full:"Pattern Recognition", pub:"Elsevier", q:"Q1", jif:"7.6", key:"pr", guide:"https://www.sciencedirect.com/journal/pattern-recognition/publish/guide-for-authors", tpl:ELS_TPL},
+    {ab:"Mathematics", full:"Mathematics", pub:"MDPI", q:"Q1", jif:"2.3", key:"mathematics", guide:"https://www.mdpi.com/journal/mathematics/instructions", tpl:MDPI_TPL},
+    {ab:"Remote Sensing", full:"Remote Sensing", pub:"MDPI", q:"Q1", jif:"4.1", key:"remotesensing", guide:"https://www.mdpi.com/journal/remotesensing/instructions", tpl:MDPI_TPL},
+    {ab:"IEEE Access", full:"IEEE Access", pub:"IEEE", q:"Q2", jif:"3.6", key:"access", guide:"https://ieeeaccess.ieee.org/guide-for-authors/", tpl:IEEE_TPL},
+    {ab:"CVIU", full:"Computer Vision and Image Understanding", pub:"Elsevier", q:"Q2", jif:"3.5", key:"cviu", guide:"https://www.sciencedirect.com/journal/computer-vision-and-image-understanding/publish/guide-for-authors", tpl:ELS_TPL},
+    {ab:"SP:IC", full:"Signal Processing: Image Communication", pub:"Elsevier", q:"Q2", jif:"2.7", key:"spic", guide:"https://www.sciencedirect.com/journal/signal-processing-image-communication/publish/guide-for-authors", tpl:ELS_TPL},
+    {ab:"Sensors", full:"Sensors", pub:"MDPI", q:"Q2", jif:"3.5", key:"sensors", guide:"https://www.mdpi.com/journal/sensors/instructions", tpl:MDPI_TPL},
+    {ab:"Electronics", full:"Electronics", pub:"MDPI", q:"Q2", jif:"2.6", key:"electronics", guide:"https://www.mdpi.com/journal/electronics/instructions", tpl:MDPI_TPL},
+    {ab:"Applied Sciences", full:"Applied Sciences", pub:"MDPI", q:"Q2", jif:"2.5", key:"applsci", guide:"https://www.mdpi.com/journal/applsci/instructions", tpl:MDPI_TPL},
+    {ab:"J. Imaging", full:"Journal of Imaging", pub:"MDPI", q:"Q2", jif:"2.7", key:"jimaging", guide:"https://www.mdpi.com/journal/jimaging/instructions", tpl:MDPI_TPL}
   ];
-  var COMMON=[
-    {t:"IEEE Template Selector (LaTeX · Word)", u:"https://template-selector.ieee.org/"},
-    {t:"IEEE Author Center", u:"https://ieeeauthorcenter.ieee.org/"}
-  ];
-  var h='<div class="cc-note">공식 author guideline 링크 모음. 투고 직전 페이지수·템플릿 버전은 반드시 공식 사이트에서 재확인.</div>';
-  h+='<div class="jr-grid">';
-  J.forEach(function(j){
-    h+='<div class="jr-card"><div class="jr-ab">'+j.ab+'</div><div class="jr-full">'+j.full+'</div><div class="jr-soc">'+j.soc+'</div><div class="jr-links">';
-    j.links.forEach(function(l){ h+='<a href="'+l.u+'" target="_blank" rel="noopener">'+l.t+' ↗</a>'; });
+  var groups=["Q1","Q2"];
+  var h='<div class="cc-note">공식 author guideline · 템플릿 페이지 링크와, 저장소 <code>templates/journals/&lt;key&gt;.zip</code> 직접 다운로드를 제공한다. 분류는 JCR 최신판(분야 대표 카테고리) 기준이며 연도·카테고리에 따라 달라질 수 있어 투고 전 Clarivate JCR 재확인 권장.</div>';
+  groups.forEach(function(g){
+    var items=J.filter(function(j){return j.q===g;});
+    if(!items.length) return;
+    h+='<div class="jr-qsec"><div class="jr-qhead"><span class="jr-qbadge '+g.toLowerCase()+'">'+g+'</span><span class="jr-qcount">'+items.length+'종</span></div><div class="jr-grid">';
+    items.forEach(function(j){
+      h+='<div class="jr-card"><div class="jr-top"><span class="jr-ab">'+j.ab+'</span><span class="jr-q '+j.q.toLowerCase()+'">'+j.q+'</span></div>';
+      h+='<div class="jr-full">'+j.full+'</div><div class="jr-soc">'+j.pub+' · JCR IF '+j.jif+'</div>';
+      h+='<button class="jr-toggle" onclick="jrToggle(this)">양식 · 링크 <span class="jr-arr">▾</span></button>';
+      h+='<div class="jr-panel">';
+      h+='<a class="jr-dl" href="templates/journals/'+j.key+'.zip" download>⬇ 양식 ZIP 다운로드</a>';
+      h+='<a class="jr-lnk" href="'+j.guide+'" target="_blank" rel="noopener">Author Guidelines ↗</a>';
+      h+='<a class="jr-lnk" href="'+j.tpl+'" target="_blank" rel="noopener">공식 템플릿 ↗</a>';
+      h+='</div></div>';
+    });
     h+='</div></div>';
   });
-  h+='</div><div class="jr-common"><span class="cc-lbl">공통 양식</span>';
-  COMMON.forEach(function(l){ h+='<a href="'+l.u+'" target="_blank" rel="noopener">'+l.t+' ↗</a>'; });
-  h+='</div>';
   W.innerHTML=h;
 }
-
 function renderConfCal(){
   var v = (ccView==="journal")?"journal":"list";
   document.getElementById("ccCalWrap").style.display = "none";
@@ -1778,7 +1822,7 @@ function ccRenderList(){
                 : st==="upcoming"?'<span class="cc-badge upcoming">남음 · D-'+ccDaysLeft(x.ddl)+'</span>'
                 : '<span class="cc-badge projected">추정</span>';
       var confTxt=(x.confOK&&proj)?x.conf+' <span style="color:var(--green)">✓</span>':(proj?'<span class="cc-est">'+x.conf+'</span>':x.conf);
-      tr.innerHTML='<td><span class="cc-venue">'+x.venue+' '+x.year+'</span><span class="cc-vtag '+x.type+'">'+CC_TYPEKO[x.type]+'</span></td>'+
+      tr.innerHTML='<td><span class="cc-venue">'+x.venue+' '+x.year+'</span><span class="cc-vtag '+x.type+'">'+CC_TYPEKO[x.type]+'</span>'+ccTplLink("conferences",x.venue)+'</td>'+
         '<td>'+ddlTxt+(x.abs&&x.abs!=="—"?'<div class="cc-sub">abstract: '+x.abs+'</div>':'')+'</td>'+
         '<td>'+badge+'</td>'+
         '<td style="color:var(--text-dim)">'+confTxt+'</td>'+
