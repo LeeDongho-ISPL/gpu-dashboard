@@ -1,27 +1,27 @@
 {
-  "last_updated": "2026-07-06T13:14:22Z",
+  "last_updated": "2026-07-06T13:30:06Z",
   "servers": [
     {
   "name": "ISPL",
   "type": "gpu",
   "status": "online",
-  "timestamp": "2026-07-06T13:14:22Z",
+  "timestamp": "2026-07-06T13:30:06Z",
   "gpu_count": 8,
   "gpu_memory_gb": 48,
-  "gpus": [{"index":0,"name":"NVIDIA RTX A6000","utilization":98,"memory_used_mb":9633,"memory_total_mb":49140,"temperature":62},{"index":1,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":12402,"memory_total_mb":49140,"temperature":32},{"index":2,"name":"NVIDIA RTX A6000","utilization":3,"memory_used_mb":4200,"memory_total_mb":49140,"temperature":37},{"index":3,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":14441,"memory_total_mb":49140,"temperature":60},{"index":4,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":7865,"memory_total_mb":49140,"temperature":40},{"index":5,"name":"NVIDIA RTX A6000","utilization":8,"memory_used_mb":1439,"memory_total_mb":49140,"temperature":44},{"index":6,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":39995,"memory_total_mb":49140,"temperature":35},{"index":7,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":35180,"memory_total_mb":49140,"temperature":58}],
-  "cpu": {"cores": 48, "load_avg": 161.38, "usage_percent": 61.3},
-  "memory": {"used_mb": 130051, "total_mb": 709363, "percent": 18.3},
+  "gpus": [{"index":0,"name":"NVIDIA RTX A6000","utilization":98,"memory_used_mb":9053,"memory_total_mb":49140,"temperature":55},{"index":1,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":12402,"memory_total_mb":49140,"temperature":32},{"index":2,"name":"NVIDIA RTX A6000","utilization":1,"memory_used_mb":4158,"memory_total_mb":49140,"temperature":37},{"index":3,"name":"NVIDIA RTX A6000","utilization":98,"memory_used_mb":14441,"memory_total_mb":49140,"temperature":60},{"index":4,"name":"NVIDIA RTX A6000","utilization":6,"memory_used_mb":4827,"memory_total_mb":49140,"temperature":40},{"index":5,"name":"NVIDIA RTX A6000","utilization":71,"memory_used_mb":2227,"memory_total_mb":49140,"temperature":62},{"index":6,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":39995,"memory_total_mb":49140,"temperature":36},{"index":7,"name":"NVIDIA RTX A6000","utilization":98,"memory_used_mb":16843,"memory_total_mb":49140,"temperature":62}],
+  "cpu": {"cores": 48, "load_avg": 167.33, "usage_percent": 65.1},
+  "memory": {"used_mb": 122543, "total_mb": 709363, "percent": 17.3},
   "disk": {"used": "2.7T", "total": "3.6T", "percent": 78},
   "users": ["ispl"],
-  "gpu_processes": [{"pid":89907,"name":"/home/ispl/anaconda3/envs/gs_hb_aa2d_acoegr/bin/python","memory_mb":9036},{"pid":147856,"name":"python","memory_mb":2896},{"pid":148110,"name":"python","memory_mb":3526},{"pid":149495,"name":"python","memory_mb":3596},{"pid":187778,"name":"python","memory_mb":2360},{"pid":3577452,"name":"python","memory_mb":2332},{"pid":3598055,"name":"python","memory_mb":2952},{"pid":330776,"name":"/home/ispl/anaconda3/envs/mip-splatting/bin/python","memory_mb":14426},{"pid":271139,"name":"/home/ispl/anaconda3/envs/semangs/bin/python","memory_mb":5998},{"pid":403076,"name":"python","memory_mb":1922},{"pid":350209,"name":"python","memory_mb":39980},{"pid":31917,"name":"/home/ispl/anaconda3/envs/mip-splatting/bin/python","memory_mb":18340},{"pid":235607,"name":"/home/ispl/anaconda3/envs/MSGS/bin/python","memory_mb":16822}]
+  "gpu_processes": [{"pid":89907,"name":"/home/ispl/anaconda3/envs/gs_hb_aa2d_acoegr/bin/python","memory_mb":9038},{"pid":147856,"name":"python","memory_mb":2896},{"pid":148110,"name":"python","memory_mb":3526},{"pid":149495,"name":"python","memory_mb":3596},{"pid":187778,"name":"python","memory_mb":2360},{"pid":3577452,"name":"python","memory_mb":2072},{"pid":3598055,"name":"python","memory_mb":2132},{"pid":330776,"name":"/home/ispl/anaconda3/envs/mip-splatting/bin/python","memory_mb":14426},{"pid":271139,"name":"/home/ispl/anaconda3/envs/semangs/bin/python","memory_mb":6196},{"pid":403076,"name":"python","memory_mb":2212},{"pid":350209,"name":"python","memory_mb":39980},{"pid":235607,"name":"/home/ispl/anaconda3/envs/MSGS/bin/python","memory_mb":15260},{"pid":564830,"name":"/home/ispl/anaconda3/envs/mip-splatting/bin/python","memory_mb":10}]
 },
     {
   "name": "CPU1",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-07-06T13:14:22Z",
-  "cpu": {"cores": 64, "load_avg": 0.00, "usage_percent": 0.1},
-  "memory": {"used_mb": 4248, "total_mb": 773344, "percent": 0.5},
+  "timestamp": "2026-07-06T13:30:06Z",
+  "cpu": {"cores": 64, "load_avg": 0.04, "usage_percent": 0.1},
+  "memory": {"used_mb": 4274, "total_mb": 773344, "percent": 0.6},
   "disk": {"used": "39G", "total": "879G", "percent": 5},
   "users": []
 },
@@ -29,9 +29,9 @@
   "name": "CPU2",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-07-06T13:14:22Z",
-  "cpu": {"cores": 64, "load_avg": 0.21, "usage_percent": 0.2},
-  "memory": {"used_mb": 6957, "total_mb": 773344, "percent": 0.9},
+  "timestamp": "2026-07-06T13:30:06Z",
+  "cpu": {"cores": 64, "load_avg": 0.06, "usage_percent": 0.2},
+  "memory": {"used_mb": 6943, "total_mb": 773344, "percent": 0.9},
   "disk": {"used": "46G", "total": "879G", "percent": 6},
   "users": ["user"]
 },
@@ -39,9 +39,9 @@
   "name": "CPU3",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-07-06T13:14:22Z",
-  "cpu": {"cores": 64, "load_avg": 0.00, "usage_percent": 0.2},
-  "memory": {"used_mb": 3985, "total_mb": 773344, "percent": 0.5},
+  "timestamp": "2026-07-06T13:30:06Z",
+  "cpu": {"cores": 64, "load_avg": 1.14, "usage_percent": 0.2},
+  "memory": {"used_mb": 3977, "total_mb": 773344, "percent": 0.5},
   "disk": {"used": "37G", "total": "879G", "percent": 5},
   "users": ["user"]
 },
@@ -49,9 +49,9 @@
   "name": "CPU4",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-07-06T13:14:22Z",
-  "cpu": {"cores": 64, "load_avg": 1.32, "usage_percent": 1.6},
-  "memory": {"used_mb": 4582, "total_mb": 773344, "percent": 0.6},
+  "timestamp": "2026-07-06T13:30:06Z",
+  "cpu": {"cores": 64, "load_avg": 1.47, "usage_percent": 1.8},
+  "memory": {"used_mb": 4618, "total_mb": 773344, "percent": 0.6},
   "disk": {"used": "162G", "total": "879G", "percent": 20},
   "users": ["user"]
 }
