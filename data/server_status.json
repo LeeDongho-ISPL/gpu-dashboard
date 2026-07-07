@@ -1,27 +1,27 @@
 {
-  "last_updated": "2026-07-07T15:29:53Z",
+  "last_updated": "2026-07-07T15:45:57Z",
   "servers": [
     {
   "name": "ISPL",
   "type": "gpu",
   "status": "online",
-  "timestamp": "2026-07-07T15:29:53Z",
+  "timestamp": "2026-07-07T15:45:57Z",
   "gpu_count": 8,
   "gpu_memory_gb": 48,
-  "gpus": [{"index":0,"name":"NVIDIA RTX A6000","utilization":23,"memory_used_mb":48613,"memory_total_mb":49140,"temperature":38},{"index":1,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":7137,"memory_total_mb":49140,"temperature":45},{"index":2,"name":"NVIDIA RTX A6000","utilization":95,"memory_used_mb":22141,"memory_total_mb":49140,"temperature":64},{"index":3,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":10645,"memory_total_mb":49140,"temperature":49},{"index":4,"name":"NVIDIA RTX A6000","utilization":3,"memory_used_mb":5417,"memory_total_mb":49140,"temperature":40},{"index":5,"name":"NVIDIA RTX A6000","utilization":98,"memory_used_mb":12559,"memory_total_mb":49140,"temperature":50},{"index":6,"name":"NVIDIA RTX A6000","utilization":62,"memory_used_mb":2373,"memory_total_mb":49140,"temperature":53},{"index":7,"name":"NVIDIA RTX A6000","utilization":96,"memory_used_mb":19064,"memory_total_mb":49140,"temperature":43}],
-  "cpu": {"cores": 48, "load_avg": 31.95, "usage_percent": 7.1},
-  "memory": {"used_mb": 138432, "total_mb": 709363, "percent": 19.5},
+  "gpus": [{"index":0,"name":"NVIDIA RTX A6000","utilization":21,"memory_used_mb":48613,"memory_total_mb":49140,"temperature":37},{"index":1,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":7133,"memory_total_mb":49140,"temperature":45},{"index":2,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":28747,"memory_total_mb":49140,"temperature":55},{"index":3,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":10645,"memory_total_mb":49140,"temperature":52},{"index":4,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":4907,"memory_total_mb":49140,"temperature":40},{"index":5,"name":"NVIDIA RTX A6000","utilization":100,"memory_used_mb":12559,"memory_total_mb":49140,"temperature":47},{"index":6,"name":"NVIDIA RTX A6000","utilization":0,"memory_used_mb":12,"memory_total_mb":49140,"temperature":31},{"index":7,"name":"NVIDIA RTX A6000","utilization":98,"memory_used_mb":25750,"memory_total_mb":49140,"temperature":46}],
+  "cpu": {"cores": 48, "load_avg": 35.17, "usage_percent": 30.2},
+  "memory": {"used_mb": 132761, "total_mb": 709363, "percent": 18.7},
   "disk": {"used": "2.7T", "total": "3.6T", "percent": 80},
   "users": ["ispl"],
-  "gpu_processes": [{"pid":2664916,"name":"python","memory_mb":48598},{"pid":267691,"name":"/home/ispl/anaconda3/envs/gs_hb_mip_acoegr/bin/python","memory_mb":7122},{"pid":3577452,"name":"python","memory_mb":4390},{"pid":3598055,"name":"python","memory_mb":1952},{"pid":1943038,"name":"python","memory_mb":4412},{"pid":1943037,"name":"python","memory_mb":7030},{"pid":333848,"name":"/home/ispl/anaconda3/envs/ana-splatting/bin/python","memory_mb":7258},{"pid":4089235,"name":"/home/ispl/anaconda3/envs/ana-splatting/bin/python","memory_mb":10630},{"pid":334710,"name":"/home/ispl/anaconda3/envs/semangs/bin/python","memory_mb":6154},{"pid":3775702,"name":"/home/ispl/anaconda3/envs/ana-splatting/bin/python","memory_mb":11530},{"pid":341282,"name":"python","memory_mb":2358},{"pid":2930947,"name":"/home/ispl/anaconda3/envs/ana-splatting/bin/python","memory_mb":14602},{"pid":365966,"name":"/home/ispl/anaconda3/envs/MSGS/bin/python","memory_mb":5084}]
+  "gpu_processes": [{"pid":2664916,"name":"python","memory_mb":48598},{"pid":267691,"name":"/home/ispl/anaconda3/envs/gs_hb_mip_acoegr/bin/python","memory_mb":7118},{"pid":3577452,"name":"python","memory_mb":5732},{"pid":3598055,"name":"python","memory_mb":2930},{"pid":1943038,"name":"python","memory_mb":4010},{"pid":1943037,"name":"python","memory_mb":5712},{"pid":333848,"name":"/home/ispl/anaconda3/envs/ana-splatting/bin/python","memory_mb":9852},{"pid":4089235,"name":"/home/ispl/anaconda3/envs/ana-splatting/bin/python","memory_mb":10630},{"pid":334710,"name":"/home/ispl/anaconda3/envs/semangs/bin/python","memory_mb":7806},{"pid":3775702,"name":"/home/ispl/anaconda3/envs/ana-splatting/bin/python","memory_mb":12544},{"pid":397275,"name":"python","memory_mb":10},{"pid":2930947,"name":"/home/ispl/anaconda3/envs/ana-splatting/bin/python","memory_mb":14484},{"pid":365966,"name":"/home/ispl/anaconda3/envs/MSGS/bin/python","memory_mb":11594}]
 },
     {
   "name": "CPU1",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-07-07T15:29:53Z",
-  "cpu": {"cores": 64, "load_avg": 0.00, "usage_percent": 0.0},
-  "memory": {"used_mb": 4528, "total_mb": 773344, "percent": 0.6},
+  "timestamp": "2026-07-07T15:45:57Z",
+  "cpu": {"cores": 64, "load_avg": 0.08, "usage_percent": 0.1},
+  "memory": {"used_mb": 4543, "total_mb": 773344, "percent": 0.6},
   "disk": {"used": "39G", "total": "879G", "percent": 5},
   "users": ["user"]
 },
@@ -29,8 +29,8 @@
   "name": "CPU2",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-07-07T15:29:53Z",
-  "cpu": {"cores": 64, "load_avg": 0.12, "usage_percent": 0.1},
+  "timestamp": "2026-07-07T15:45:57Z",
+  "cpu": {"cores": 64, "load_avg": 0.01, "usage_percent": 0.2},
   "memory": {"used_mb": 10565, "total_mb": 773344, "percent": 1.4},
   "disk": {"used": "46G", "total": "879G", "percent": 6},
   "users": ["user"]
@@ -39,7 +39,7 @@
   "name": "CPU3",
   "type": "cpu",
   "status": "offline",
-  "timestamp": "2026-07-07T15:29:53Z",
+  "timestamp": "2026-07-07T15:45:57Z",
   "cpu": {},
   "memory": {},
   "disk": {},
@@ -49,9 +49,9 @@
   "name": "CPU4",
   "type": "cpu",
   "status": "online",
-  "timestamp": "2026-07-07T15:29:53Z",
-  "cpu": {"cores": 64, "load_avg": 0.10, "usage_percent": 0.2},
-  "memory": {"used_mb": 4624, "total_mb": 773344, "percent": 0.6},
+  "timestamp": "2026-07-07T15:45:57Z",
+  "cpu": {"cores": 64, "load_avg": 0.18, "usage_percent": 0.1},
+  "memory": {"used_mb": 4640, "total_mb": 773344, "percent": 0.6},
   "disk": {"used": "162G", "total": "879G", "percent": 20},
   "users": ["user"]
 }
