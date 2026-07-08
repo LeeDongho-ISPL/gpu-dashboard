@@ -1,0 +1,44 @@
+{
+  "last_checked": "2026-07-08T00:00:00Z",
+  "source": "https://signalprocessingsociety.org/publications-resources/special-issue-deadlines",
+  "items": [
+    {
+      "journal": "TMM",
+      "title": "Special Section on Multimodal Video Compression and Reconstruction: Theory, Algorithms, and Applications",
+      "ddl": "2026-07-30",
+      "pub": "2027 Q1",
+      "url": "https://signalprocessingsociety.org/events/ieee-tmm-special-section-multimodal-video-compression-and-reconstruction-theory-algorithms",
+      "relevant": true,
+      "source": "sps-auto",
+      "note": "learning-based codec / 압축 열화 복원 / SR·보간 / immersive XR 스트리밍"
+    },
+    {
+      "journal": "TMM",
+      "title": "Special Section on Generative AI for World Simulations and Communications",
+      "ddl": "2026-08-01",
+      "pub": "2027 Q1",
+      "url": "https://signalprocessingsociety.org/events/ieee-tmm-special-section-generative-ai-world-simulations-and-communications",
+      "relevant": true,
+      "source": "sps-auto",
+      "note": "scope에 Gaussian splatting·neural fields 명시, GenAI 기반 coding 포함"
+    },
+    {
+      "journal": "JSTSP",
+      "title": "Signal Processing for Trustworthiness in 6G Wireless Ecosystems",
+      "ddl": "2026-07-31",
+      "pub": "2027-03",
+      "url": "https://signalprocessingsociety.org/events/ieee-journal-selected-topics-signal-processing-signal-processing-trustworthiness-6g-wireless",
+      "relevant": false,
+      "source": "sps-auto"
+    },
+    {
+      "journal": "SPM",
+      "title": "Signal Processing for Fluid Antenna Systems: Foundations, Algorithms, and Emerging Applications",
+      "ddl": "2026-08-01",
+      "pub": "2027-12",
+      "url": "https://signalprocessingsociety.org/events/ieee-spm-signal-processing-fluid-antenna-systems-foundations-algorithms-and-emerging",
+      "relevant": false,
+      "source": "sps-auto"
+    }
+  ]
+}

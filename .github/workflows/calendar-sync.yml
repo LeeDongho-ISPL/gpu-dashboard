@@ -1,0 +1,87 @@
+name: Calendar Sync
+
+# 매주 월요일 09:00 KST (00:00 UTC):
+#   1) IEEE SPS 스페셜 이슈 마감 페이지 → data/special_issues.json 갱신·커밋
+#   2) data/conferences.json ↔ ccf-deadlines 대조 → 불일치 시 Issue 생성
+on:
+  schedule:
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install requests beautifulsoup4 pyyaml
+
+      - name: Update special issues (SPS)
+        run: python scripts/update_special_issues.py
+
+      - name: Commit special_issues.json if changed
+        run: |
+          git config user.name "ISPL Dashboard Bot"
+          git config user.email "dashboard@ispl.local"
+          if git diff --quiet data/special_issues.json; then
+            echo "No changes."
+          else
+            git add data/special_issues.json
+            git commit -m "chore: update special issues $(date -u +%Y-%m-%d)"
+            git pull --rebase origin main
+            git push origin main
+          fi
+
+      - name: Check conferences vs ccf-deadlines
+        run: python scripts/check_conferences.py
+
+      - name: Open issue on mismatch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let report = { mismatches: [] };
+            try { report = JSON.parse(fs.readFileSync('cal_sync_report.json', 'utf8')); } catch (e) {}
+            const ms = report.mismatches || [];
+            if (!ms.length) { console.log('불일치 없음'); return; }
+
+            const body = [
+              '주간 자동 대조에서 `data/conferences.json` 과 [ccf-deadlines](https://github.com/ccfddl/ccf-deadlines) 의 불일치가 발견되었습니다.',
+              '',
+              '| 학회 | 대시보드 | ccf-deadlines | 대시보드 라벨 | 심각도 |',
+              '|---|---|---|---|---|',
+              ...ms.map(m => `| ${m.venue} ${m.year} | ${m.ours} | ${m.ccfddl} | ${m.ours_cfd} | ${m.severity} |`),
+              '',
+              '공식 학회 사이트에서 확인 후 `data/conferences.json` 을 수정하고 (확정이면 `cfd: "confirmed"`) 이 이슈를 닫아주세요.',
+              '_ccf-deadlines도 커뮤니티 데이터이므로 오류 가능성이 있습니다 — 반드시 공식 소스로 재확인._'
+            ].join('\n');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              ...context.repo, state: 'open', labels: 'cal-sync'
+            });
+            if (open.length) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: open[0].number, body
+              });
+              console.log(`기존 이슈 #${open[0].number}에 코멘트 추가`);
+            } else {
+              await github.rest.issues.create({
+                ...context.repo,
+                title: `[cal-sync] 학회 캘린더 불일치 ${ms.length}건 (${new Date().toISOString().slice(0,10)})`,
+                labels: ['cal-sync'],
+                body
+              });
+              console.log('새 이슈 생성');
+            }

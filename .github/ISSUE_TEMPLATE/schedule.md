@@ -9,16 +9,15 @@ labels: schedule
 {
   "date": "2026-04-10",
   "user": "이름",
-  "server": "NIPA_server",
+  "server": "ISPL",
   "start_time": "09:00",
   "end_time": "18:00",
-  "gpus": [],
+  "gpus": [0, 1],
   "note": "실험 내용"
 }
 ```
 
 **서버 목록:**
-- `NIPA_server` : GPU 1× 80GB
 - `ISPL` : GPU 8× 48GB (gpus 필드에 사용할 GPU 번호 입력, 예: [0, 1, 2])
 - `CPU1` ~ `CPU4` : CPU 서버
 

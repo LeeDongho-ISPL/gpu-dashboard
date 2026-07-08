@@ -4,6 +4,9 @@ scripts/servers.conf
 # 로그 파일
 logs/
 
+# calendar-sync 워크플로 임시 리포트
+cal_sync_report.json
+
 # OS
 .DS_Store
 Thumbs.db

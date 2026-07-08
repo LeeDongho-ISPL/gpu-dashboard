@@ -1,0 +1,363 @@
+[
+  {
+    "venue": "3DV",
+    "type": "d3",
+    "year": 2026,
+    "ddl": "2025-08-18",
+    "abs": "2025-08-21 (supp)",
+    "conf": "2026.3.20–23",
+    "loc": "Vancouver, CA",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "AAAI",
+    "type": "ml",
+    "year": 2026,
+    "ddl": "2025-08-15",
+    "abs": "2025-08-08",
+    "conf": "2026.1",
+    "loc": "Singapore",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "ICLR",
+    "type": "ml",
+    "year": 2026,
+    "ddl": "2025-09-24",
+    "abs": "—",
+    "conf": "2026.4",
+    "loc": "Rio, BR",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "CVPR",
+    "type": "cv",
+    "year": 2026,
+    "ddl": "2025-11-14",
+    "abs": "2025-11-07",
+    "conf": "2026.6",
+    "loc": "Denver, US",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "SIGGRAPH",
+    "type": "gfx",
+    "year": 2026,
+    "ddl": "2026-01-22",
+    "abs": "form 2026-01-15",
+    "conf": "2026.8",
+    "loc": "Los Angeles, US",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "ICML",
+    "type": "ml",
+    "year": 2026,
+    "ddl": "2026-01-28",
+    "abs": "2026-01-22",
+    "conf": "2026.7",
+    "loc": "Seoul, KR",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "ECCV",
+    "type": "cv",
+    "year": 2026,
+    "ddl": "2026-03-06",
+    "abs": "~2026-02-27",
+    "conf": "2026.9.8–12",
+    "loc": "Malmö, SE",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "NeurIPS",
+    "type": "ml",
+    "year": 2026,
+    "ddl": "2026-05-06",
+    "abs": "2026-05-04",
+    "conf": "2026.12",
+    "loc": "San Diego, US",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "SIGGRAPH Asia",
+    "type": "gfx",
+    "year": 2026,
+    "ddl": "2026-05-12",
+    "abs": "stage-1 2026-05-05",
+    "conf": "2026.12",
+    "loc": "TBD",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "AAAI",
+    "type": "ml",
+    "year": 2027,
+    "ddl": "2026-07-28",
+    "abs": "2026-07-21",
+    "conf": "2027.2.16–23",
+    "loc": "Montréal, CA",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "3DV",
+    "type": "d3",
+    "year": 2027,
+    "ddl": "2026-08-28",
+    "abs": "2026-09-02 (supp)",
+    "conf": "2027.4.6–9",
+    "loc": "Thessaloniki, GR",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "ICLR",
+    "type": "ml",
+    "year": 2027,
+    "ddl": "2026-09-24",
+    "abs": "—",
+    "conf": "2027.4",
+    "loc": "West Coast NA",
+    "cfd": "projected"
+  },
+  {
+    "venue": "CVPR",
+    "type": "cv",
+    "year": 2027,
+    "ddl": "2026-11-13",
+    "abs": "~2026-11-06",
+    "conf": "2027.6.19–26",
+    "loc": "Seattle, US",
+    "cfd": "projected",
+    "confOK": true
+  },
+  {
+    "venue": "SIGGRAPH",
+    "type": "gfx",
+    "year": 2027,
+    "ddl": "2027-01-21",
+    "abs": "form ~1월 중순",
+    "conf": "2027.8",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "ICML",
+    "type": "ml",
+    "year": 2027,
+    "ddl": "2027-01-28",
+    "abs": "~1월말",
+    "conf": "2027.7",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "ICCV",
+    "type": "cv",
+    "year": 2027,
+    "ddl": "2027-03-08",
+    "abs": "~3월 초",
+    "conf": "2027.10",
+    "loc": "Hong Kong",
+    "cfd": "projected"
+  },
+  {
+    "venue": "SIGGRAPH Asia",
+    "type": "gfx",
+    "year": 2027,
+    "ddl": "2027-05-11",
+    "abs": "stage-1 ~5월 초",
+    "conf": "2027.12",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "NeurIPS",
+    "type": "ml",
+    "year": 2027,
+    "ddl": "2027-05-12",
+    "abs": "~5월 초",
+    "conf": "2027.12",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "AAAI",
+    "type": "ml",
+    "year": 2028,
+    "ddl": "2027-07-28",
+    "abs": "~7월 중순",
+    "conf": "2028.2",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "3DV",
+    "type": "d3",
+    "year": 2028,
+    "ddl": "2027-08-18",
+    "abs": "~8월 중순",
+    "conf": "2028.3",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "ICLR",
+    "type": "ml",
+    "year": 2028,
+    "ddl": "2027-09-24",
+    "abs": "—",
+    "conf": "2028.4",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "CVPR",
+    "type": "cv",
+    "year": 2028,
+    "ddl": "2027-11-12",
+    "abs": "~11월 초",
+    "conf": "2028.6",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "SIGGRAPH",
+    "type": "gfx",
+    "year": 2028,
+    "ddl": "2028-01-20",
+    "abs": "form ~1월 중순",
+    "conf": "2028.8",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "ICML",
+    "type": "ml",
+    "year": 2028,
+    "ddl": "2028-01-28",
+    "abs": "~1월말",
+    "conf": "2028.7",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "ECCV",
+    "type": "cv",
+    "year": 2028,
+    "ddl": "2028-03-06",
+    "abs": "~2월말",
+    "conf": "2028.9",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "SIGGRAPH Asia",
+    "type": "gfx",
+    "year": 2028,
+    "ddl": "2028-05-10",
+    "abs": "stage-1 ~5월 초",
+    "conf": "2028.12",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "NeurIPS",
+    "type": "ml",
+    "year": 2028,
+    "ddl": "2028-05-10",
+    "abs": "~5월 초",
+    "conf": "2028.12",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "AAAI",
+    "type": "ml",
+    "year": 2029,
+    "ddl": "2028-07-28",
+    "abs": "~7월 중순",
+    "conf": "2029.2",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "3DV",
+    "type": "d3",
+    "year": 2029,
+    "ddl": "2028-08-18",
+    "abs": "~8월 중순",
+    "conf": "2029.3",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "ICLR",
+    "type": "ml",
+    "year": 2029,
+    "ddl": "2028-09-24",
+    "abs": "—",
+    "conf": "2029.4",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "CVPR",
+    "type": "cv",
+    "year": 2029,
+    "ddl": "2028-11-12",
+    "abs": "~11월 초",
+    "conf": "2029.6",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "SIGGRAPH",
+    "type": "gfx",
+    "year": 2029,
+    "ddl": "2029-01-18",
+    "abs": "form ~1월 중순",
+    "conf": "2029.8",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "ICML",
+    "type": "ml",
+    "year": 2029,
+    "ddl": "2029-01-26",
+    "abs": "~1월말",
+    "conf": "2029.7",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "ICCV",
+    "type": "cv",
+    "year": 2029,
+    "ddl": "2029-03-07",
+    "abs": "~3월 초",
+    "conf": "2029.10",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "SIGGRAPH Asia",
+    "type": "gfx",
+    "year": 2029,
+    "ddl": "2029-05-09",
+    "abs": "stage-1 ~5월 초",
+    "conf": "2029.12",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "NeurIPS",
+    "type": "ml",
+    "year": 2029,
+    "ddl": "2029-05-09",
+    "abs": "~5월 초",
+    "conf": "2029.12",
+    "loc": "TBD",
+    "cfd": "projected"
+  }
+]

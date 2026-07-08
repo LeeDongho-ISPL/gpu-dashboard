@@ -1,6 +1,6 @@
 #!/bin/bash
 # collect_status.sh - SSH로 각 서버에 접속하여 GPU/CPU/Memory 상태를 수집
-# NIPA 서버에서 cron으로 실행됨
+# 연구실 Windows PC의 run_collector.sh 루프에서 실행됨
 
 set -euo pipefail
 
@@ -258,7 +258,7 @@ EOF
 echo "Starting collection at $TIMESTAMP"
 
 # GPU Servers
-NIPA_JSON=$(collect_gpu_server "NIPA_server" "$NIPA_IP" "$NIPA_PORT" "$NIPA_USER" 1 80)
+# (NIPA_server 제거됨 — 2026-07 NIPA 지원 종료)
 ISPL_JSON=$(collect_gpu_server "ISPL" "$ISPL_IP" "$ISPL_PORT" "$ISPL_USER" 8 48)
 
 # CPU Servers
@@ -273,7 +273,6 @@ cat <<EOF > "$OUTPUT_DIR/server_status.json"
 {
   "last_updated": "$TIMESTAMP",
   "servers": [
-    $NIPA_JSON,
     $ISPL_JSON,
     $CPU1_JSON,
     $CPU2_JSON,

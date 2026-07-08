@@ -218,7 +218,6 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
   font-size: 10px; padding: 2px 5px; border-radius: 4px; margin-bottom: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
 }
-.cal-event.nipa { background: rgba(108,122,255,0.2); color: var(--accent-light); }
 .cal-event.ispl-srv { background: rgba(52,211,153,0.2); color: var(--green); }
 .cal-event.cpu-srv { background: rgba(251,191,36,0.2); color: var(--yellow); }
 
@@ -484,6 +483,33 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
 .jr-lnk:hover{text-decoration:underline}
 .cc-dl{display:inline-block;margin-left:8px;font-size:10.5px;color:var(--accent,#6c7aff);text-decoration:none;border:1px solid var(--border,#2a2e3d);border-radius:6px;padding:1px 6px;white-space:nowrap;vertical-align:middle}
 .cc-dl:hover{border-color:var(--accent,#6c7aff)}
+/* ===== deadline banner + schedule-calendar conf badges + special issue view ===== */
+.ddl-banner { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:16px; padding:10px 14px; background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.25); border-radius:10px; font-size:12px; }
+.ddl-banner-icon { font-size:14px; }
+.ddl-chip { cursor:pointer; padding:4px 10px; border-radius:999px; background:var(--card); border:1px solid var(--border); color:var(--text); transition:border-color .15s; }
+.ddl-chip b { color:var(--yellow); margin-left:2px; }
+.ddl-chip.urgent b { color:#f87171; }
+.ddl-chip.proj { border-style:dashed; font-style:italic; opacity:.85; }
+.ddl-chip:hover { border-color:var(--accent); }
+.cal-conf-ddl { font-size:9.5px; padding:1px 4px; margin-top:2px; border-radius:4px; background:rgba(167,139,250,0.14); color:#a78bfa; border-left:2px solid #a78bfa; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cal-conf-ddl.si { background:rgba(34,211,238,0.12); color:#22d3ee; border-left-color:#22d3ee; }
+.cal-conf-ddl.proj { border-left-style:dashed; font-style:italic; opacity:.8; }
+.dd-conf-box { margin-bottom:12px; display:flex; flex-direction:column; gap:6px; }
+.dd-conf-item { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.2); font-size:12px; cursor:pointer; }
+.dd-conf-item:hover { border-color:#a78bfa; }
+.dd-conf-item.proj { border-style:dashed; font-style:italic; }
+.dd-conf-name { flex:1; }
+.dd-conf-d { font-weight:700; color:var(--yellow); }
+.si-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:12px; }
+.si-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px; }
+.si-card.si-dim { opacity:.55; }
+.si-card.si-passed { opacity:.45; }
+.si-top { display:flex; align-items:center; justify-content:space-between; }
+.si-journal { font-weight:700; color:var(--accent-light); font-size:13px; }
+.si-title { font-size:13px; line-height:1.45; }
+.si-meta { font-size:11.5px; color:var(--text-dim); }
+.si-note { font-size:11.5px; color:#a78bfa; }
+.si-src { color:var(--yellow); }
 </style>
 </head>
 <body>
@@ -513,6 +539,9 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
       <div id="dataSource" style="font-size:11px;margin-top:2px;"></div>
     </div>
   </div>
+
+  <!-- 마감 임박 배너 (학회 + 스페셜 이슈, D-30 이내) -->
+  <div id="ddlBanner" class="ddl-banner" style="display:none;"></div>
 
   <!-- Tabs & Timezone -->
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
@@ -600,7 +629,6 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
           <div class="form-row">
             <label>서버</label>
             <select id="formServer">
-              <option value="NIPA_server">NIPA_server (GPU 1×80GB)</option>
               <option value="ISPL">ISPL (GPU 8×48GB)</option>
               <option value="CPU1">CPU1</option>
               <option value="CPU2">CPU2</option>
@@ -650,6 +678,7 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
     <div class="cc-bar">
       <div class="cc-seg">
         <button class="active" id="ccViewList" onclick="ccSetView('list')">컨퍼런스</button>
+        <button id="ccViewSI" onclick="ccSetView('si')">스페셜 이슈</button>
         <button id="ccViewJournal" onclick="ccSetView('journal')">저널 양식</button>
       </div>
       <div class="cc-yjump" id="ccYjump"></div>
@@ -684,6 +713,7 @@ table.cc-list tr.cc-passrow { opacity:0.5; }
     </div>
     <!-- List view -->
     <div id="ccListWrap" style="display:none;"></div>
+    <div id="ccSIWrap" style="display:none;"></div>
     <div id="ccJournalWrap" style="display:none;"></div>
 
     <div id="cc-detail"></div>
@@ -701,7 +731,6 @@ const SCHEDULE_URL = 'https://script.google.com/macros/s/AKfycbwXCBYqdz1-_F4AvMz
 const REFRESH_INTERVAL = 5 * 60 * 1000; // 5분
 
 const SERVER_COLORS = {
-  'NIPA_server': 'nipa',
   'ISPL': 'ispl-srv',
   'CPU1': 'cpu-srv', 'CPU2': 'cpu-srv', 'CPU3': 'cpu-srv', 'CPU4': 'cpu-srv'
 };
@@ -1041,8 +1070,15 @@ function renderCalendar() {
       return `<div class="cal-event ${cls}" style="border-left:2px solid ${uc};" title="${ev.user}: ${ev.server} ${ev.start_time}-${ev.end_time}">${ev.user} · ${ev.server}</div>`;
     }).join('') + (events.length > 3 ? `<div style="font-size:10px;color:var(--text-dim)">+${events.length-3}개 더</div>` : '');
 
+    // 학회·스페셜이슈 마감 뱃지 (data/conferences.json + data/special_issues.json → CONF_DDL_MAP)
+    const ddls = (window.CONF_DDL_MAP || {})[dateStr] || [];
+    const ddlHTML = ddls.slice(0, 2).map(c =>
+      `<div class="cal-conf-ddl${c.proj ? ' proj' : ''}${c.kind === 'si' ? ' si' : ''}" title="${c.tip}">${c.short}</div>`
+    ).join('') + (ddls.length > 2 ? `<div style="font-size:9px;color:#a78bfa">+${ddls.length-2}</div>` : '');
+
     html += `<div class="cal-cell ${isToday ? 'today' : ''} ${isSel ? 'selected' : ''}" onclick="selectDate('${dateStr}')">
       <span class="day-num">${d}</span>
+      ${ddlHTML}
       ${evHTML}
     </div>`;
   }
@@ -1075,10 +1111,21 @@ function selectDate(dateStr) {
   const avDateEl = document.getElementById('gpuAvailDate');
   if (avDateEl) avDateEl.textContent = `${d.getMonth()+1}월 ${d.getDate()}일 (${dayNames[d.getDay()]})`;
 
+  // 이 날짜의 학회·스페셜이슈 마감 (클릭 → 학회 캘린더 상세 / CFP 링크)
+  const dayDdls = (window.CONF_DDL_MAP || {})[dateStr] || [];
+  const ddlSection = dayDdls.length ? `<div class="dd-conf-box">` + dayDdls.map(c => {
+    const click = c.kind === 'si' ? `window.open('${c.url}','_blank')` : `ccJumpDetail(${c.i})`;
+    return `<div class="dd-conf-item${c.proj ? ' proj' : ''}" onclick="${click}">
+      <span class="dd-conf-icon">${c.kind === 'si' ? '📑' : '🎓'}</span>
+      <span class="dd-conf-name">${c.title}</span>
+      <span class="dd-conf-d">${c.dday}</span>
+    </div>`;
+  }).join('') + `</div>` : '';
+
   if (events.length === 0) {
-    document.getElementById('detailContent').innerHTML = `<p style="color:var(--text-dim);font-size:13px;">이 날에 등록된 예약이 없습니다.</p>`;
+    document.getElementById('detailContent').innerHTML = ddlSection + `<p style="color:var(--text-dim);font-size:13px;">이 날에 등록된 예약이 없습니다.</p>`;
   } else {
-    document.getElementById('detailContent').innerHTML = events.map(ev => {
+    document.getElementById('detailContent').innerHTML = ddlSection + events.map(ev => {
       const uc = resolveColor(ev.user);
       const gpuInfo = ev.gpus ? `<div class="ev-time">GPU: ${ev.gpus.join(', ')}</div>` : '';
       return `
@@ -1484,17 +1531,6 @@ function getDemoData() {
     last_updated: new Date().toISOString(),
     servers: [
       {
-        name: "NIPA_server", type: "gpu", status: "online",
-        timestamp: new Date().toISOString(), host: "-",
-        gpu_count: 1, gpu_memory_gb: 80,
-        gpus: [{ index: 0, name: "NVIDIA A100 80GB", utilization: 73, memory_used_mb: 54272, memory_total_mb: 81920, temperature: 62 }],
-        cpu: { cores: 32, load_avg: 4.2, usage_percent: 28.5 },
-        memory: { used_mb: 45056, total_mb: 131072, percent: 34.4 },
-        disk: { used: "1.2T", total: "3.6T", percent: 33 },
-        users: ["ispl", "dongho"],
-        gpu_processes: [{ pid: 12345, name: "python train.py", memory_mb: 51200 }]
-      },
-      {
         name: "ISPL", type: "gpu", status: "online",
         timestamp: new Date().toISOString(), host: "-",
         gpu_count: 8, gpu_memory_gb: 48,
@@ -1559,12 +1595,12 @@ function getDemoSchedule() {
   const dayAfter = new Date(today); dayAfter.setDate(today.getDate()+2);
 
   return [
-    { date: fmt(today), user: "동호", server: "NIPA_server", start_time: "09:00", end_time: "18:00", note: "3DGS anti-aliasing 실험" },
+    { date: fmt(today), user: "동호", server: "ISPL", start_time: "09:00", end_time: "18:00", gpus: [4, 5], note: "3DGS anti-aliasing 실험" },
     { date: fmt(today), user: "민수", server: "ISPL", start_time: "10:00", end_time: "22:00", gpus: [0, 1], note: "NeRF training" },
     { date: fmt(today), user: "지현", server: "ISPL", start_time: "14:00", end_time: "20:00", gpus: [3, 6], note: "Evaluation" },
     { date: fmt(tomorrow), user: "동호", server: "ISPL", start_time: "09:00", end_time: "23:00", gpus: [0, 1, 2, 3], note: "Multi-GPU training" },
     { date: fmt(tomorrow), user: "수진", server: "CPU1", start_time: "10:00", end_time: "17:00", note: "데이터 전처리" },
-    { date: fmt(dayAfter), user: "민수", server: "NIPA_server", start_time: "00:00", end_time: "23:59", note: "Long training run" }
+    { date: fmt(dayAfter), user: "민수", server: "ISPL", start_time: "00:00", end_time: "23:59", gpus: [6, 7], note: "Long training run" }
   ];
 }
 
@@ -1626,8 +1662,10 @@ if (sessionStorage.getItem('ispl_dash_auth') === 'true') {
 <script>
 // ============================================================
 // Conference Calendar (학회 마감 캘린더) — cc/CC namespace, isolated
+// 실데이터: data/conferences.json (Actions가 매주 ccf-deadlines와 대조 검증)
+// 아래 배열은 fetch 실패 시(로컬 file:// 미리보기 등) fallback 전용 — 유지보수하지 않음
 // ============================================================
-const CC_DATA = [
+const CC_FALLBACK = [
   {venue:"3DV", type:"d3", year:2026, ddl:"2025-08-18", abs:"2025-08-21 (supp)", conf:"2026.3.20–23", loc:"Vancouver, CA", cfd:"confirmed"},
   {venue:"AAAI", type:"ml", year:2026, ddl:"2025-08-15", abs:"2025-08-08", conf:"2026.1", loc:"Singapore", cfd:"confirmed"},
   {venue:"ICLR", type:"ml", year:2026, ddl:"2025-09-24", abs:"—", conf:"2026.4", loc:"Rio, BR", cfd:"confirmed"},
@@ -1638,12 +1676,12 @@ const CC_DATA = [
   {venue:"NeurIPS", type:"ml", year:2026, ddl:"2026-05-06", abs:"2026-05-04", conf:"2026.12", loc:"San Diego, US", cfd:"confirmed"},
   {venue:"SIGGRAPH Asia", type:"gfx", year:2026, ddl:"2026-05-12", abs:"stage-1 2026-05-05", conf:"2026.12", loc:"TBD", cfd:"confirmed"},
   {venue:"AAAI", type:"ml", year:2027, ddl:"2026-07-28", abs:"2026-07-21", conf:"2027.2.16–23", loc:"Montréal, CA", cfd:"confirmed"},
-  {venue:"3DV", type:"d3", year:2027, ddl:"2026-08-18", abs:"~8월말", conf:"2027.3", loc:"TBD", cfd:"projected"},
-  {venue:"ICLR", type:"ml", year:2027, ddl:"2026-09-24", abs:"—", conf:"2027.4.24–28", loc:"TBD", cfd:"confirmed"},
+  {venue:"3DV", type:"d3", year:2027, ddl:"2026-08-28", abs:"2026-09-02 (supp)", conf:"2027.4.6–9", loc:"Thessaloniki, GR", cfd:"confirmed"},
+  {venue:"ICLR", type:"ml", year:2027, ddl:"2026-09-24", abs:"—", conf:"2027.4", loc:"West Coast NA", cfd:"projected"},
   {venue:"CVPR", type:"cv", year:2027, ddl:"2026-11-13", abs:"~2026-11-06", conf:"2027.6.19–26", loc:"Seattle, US", cfd:"projected", confOK:true},
   {venue:"SIGGRAPH", type:"gfx", year:2027, ddl:"2027-01-21", abs:"form ~1월 중순", conf:"2027.8", loc:"TBD", cfd:"projected"},
   {venue:"ICML", type:"ml", year:2027, ddl:"2027-01-28", abs:"~1월말", conf:"2027.7", loc:"TBD", cfd:"projected"},
-  {venue:"ICCV", type:"cv", year:2027, ddl:"2027-03-08", abs:"~3월 초", conf:"2027.10", loc:"TBD", cfd:"projected"},
+  {venue:"ICCV", type:"cv", year:2027, ddl:"2027-03-08", abs:"~3월 초", conf:"2027.10", loc:"Hong Kong", cfd:"projected"},
   {venue:"SIGGRAPH Asia", type:"gfx", year:2027, ddl:"2027-05-11", abs:"stage-1 ~5월 초", conf:"2027.12", loc:"TBD", cfd:"projected"},
   {venue:"NeurIPS", type:"ml", year:2027, ddl:"2027-05-12", abs:"~5월 초", conf:"2027.12", loc:"TBD", cfd:"projected"},
   {venue:"AAAI", type:"ml", year:2028, ddl:"2027-07-28", abs:"~7월 중순", conf:"2028.2", loc:"TBD", cfd:"projected"},
@@ -1665,7 +1703,7 @@ const CC_DATA = [
   {venue:"SIGGRAPH Asia", type:"gfx", year:2029, ddl:"2029-05-09", abs:"stage-1 ~5월 초", conf:"2029.12", loc:"TBD", cfd:"projected"},
   {venue:"NeurIPS", type:"ml", year:2029, ddl:"2029-05-09", abs:"~5월 초", conf:"2029.12", loc:"TBD", cfd:"projected"},
 ];
-CC_DATA.forEach(function(x,i){ x._i=i; });
+let CC_DATA = [];   // data/conferences.json 로드 후 채워짐 (하단 ccLoadData)
 const CC_TYPEKO = {cv:"Vision", ml:"ML", gfx:"Graphics", d3:"3D"};
 const CC_COL = {cv:"#6c7aff", ml:"#a78bfa", gfx:"#fb923c", d3:"#22d3ee"};
 const CC_BG  = {cv:"rgba(108,122,255,0.14)", ml:"rgba(167,139,250,0.16)", gfx:"rgba(251,146,60,0.14)", d3:"rgba(34,211,238,0.14)"};
@@ -1677,11 +1715,12 @@ const CC_MIN_Y=2025, CC_MIN_M=7, CC_MAX_Y=2029, CC_MAX_M=11;
 let ccView = "list";
 const ccCat = {cv:1,ml:1,gfx:1,d3:1}, ccSt = {passed:1,upcoming:1,projected:1};
 let ccY, ccM;
-(function ccInit(){
+function ccInitFromData(){
+  CC_DATA.forEach(function(x,i){ x._i=i; });
   var up = CC_DATA.filter(function(x){ return x.ddl >= CC_TKEY; }).map(function(x){ return x.ddl; }).sort();
-  var pick = up.length ? up[0] : CC_DATA.map(function(x){return x.ddl;}).sort().slice(-1)[0];
+  var pick = up.length ? up[0] : (CC_DATA.map(function(x){return x.ddl;}).sort().slice(-1)[0] || CC_TKEY);
   var p = pick.split("-"); ccY = parseInt(p[0],10); ccM = parseInt(p[1],10)-1;
-})();
+}
 
 function ccStatusOf(x){
   var past = new Date(x.ddl+"T23:59:59") < CC_TODAY;
@@ -1757,15 +1796,17 @@ function renderJournalGuides(){
   W.innerHTML=h;
 }
 function renderConfCal(){
-  var v = (ccView==="journal")?"journal":"list";
+  var v = (ccView==="journal")?"journal":(ccView==="si")?"si":"list";
   document.getElementById("ccCalWrap").style.display = "none";
   document.getElementById("ccListWrap").style.display = (v==="list")?"block":"none";
   var jw=document.getElementById("ccJournalWrap"); if(jw) jw.style.display=(v==="journal")?"block":"none";
+  var sw=document.getElementById("ccSIWrap"); if(sw) sw.style.display=(v==="si")?"block":"none";
   var yj=document.getElementById("ccYjump"); if(yj) yj.style.display="none";
   var flt=document.querySelector("#confcalSection .cc-filters"); if(flt) flt.style.display=(v==="list")?"flex":"none";
   var bl=document.getElementById("ccViewList"); if(bl) bl.classList.toggle("active", v==="list");
   var bj=document.getElementById("ccViewJournal"); if(bj) bj.classList.toggle("active", v==="journal");
-  if(v==="list") ccRenderList(); else renderJournalGuides();
+  var bs=document.getElementById("ccViewSI"); if(bs) bs.classList.toggle("active", v==="si");
+  if(v==="list") ccRenderList(); else if(v==="si") ccRenderSI(); else renderJournalGuides();
 }
 function ccSetView(v){ ccView=v; var d=document.getElementById("cc-detail"); d.className=""; renderConfCal(); }
 function ccStep(delta){
@@ -1861,6 +1902,146 @@ document.querySelectorAll('#confcalSection .cc-chip[data-cat]').forEach(function
 document.querySelectorAll('#confcalSection .cc-chip[data-st]').forEach(function(c){ c.onclick=function(){
   var k=c.dataset.st; ccSt[k]=!ccSt[k]; c.classList.toggle("on"); renderConfCal();
 };});
+
+// ============================================================
+// 데이터 로딩 + D-30 배너 + 스케줄 캘린더 마감 뱃지 + 스페셜 이슈 뷰
+// ============================================================
+let SI_DATA = { items: [] };
+
+function buildConfDdlMap(){
+  var m = {};
+  function push(key, item){ (m[key] = m[key] || []).push(item); }
+  CC_DATA.forEach(function(x){
+    var proj = (x.cfd === "projected");
+    var dl = ccDaysLeft(x.ddl);
+    push(x.ddl, {
+      kind: "conf", i: x._i, proj: proj,
+      short: (proj ? "~" : "") + "🎓" + x.venue,
+      title: x.venue + " " + x.year + " 논문 마감" + (proj ? " (추정)" : ""),
+      tip: x.venue + " " + x.year + " 논문 마감 " + ccYmd(x.ddl) + (proj ? " (추정)" : "") + " · " + x.loc,
+      dday: dl > 0 ? "D-" + dl : (dl === 0 ? "D-DAY" : "지남")
+    });
+    // abstract/supp/form 등 2차 날짜 (abs 필드에 YYYY-MM-DD가 있을 때만)
+    var am = /(\d{4}-\d{2}-\d{2})/.exec(x.abs || "");
+    if (am) {
+      var aproj = proj || (x.abs || "").indexOf("~") !== -1;
+      var akind = /supp/i.test(x.abs) ? "supp" : /form/i.test(x.abs) ? "abstract(form)" : /stage/i.test(x.abs) ? "stage-1" : "abstract";
+      var adl = ccDaysLeft(am[1]);
+      push(am[1], {
+        kind: "conf", i: x._i, proj: aproj,
+        short: (aproj ? "~" : "") + "📝" + x.venue,
+        title: x.venue + " " + x.year + " " + akind + " 마감" + (aproj ? " (추정)" : ""),
+        tip: x.venue + " " + x.year + " " + akind + " 마감 " + ccYmd(am[1]) + (aproj ? " (추정)" : ""),
+        dday: adl > 0 ? "D-" + adl : (adl === 0 ? "D-DAY" : "지남")
+      });
+    }
+  });
+  (SI_DATA.items || []).forEach(function(s){
+    if(!s.ddl) return;
+    var dl = ccDaysLeft(s.ddl);
+    push(s.ddl, {
+      kind: "si", url: s.url || "#", proj: false,
+      short: "📑" + s.journal + " SI",
+      title: "[" + s.journal + " SI] " + s.title,
+      tip: s.journal + " 스페셜 이슈 마감 " + ccYmd(s.ddl) + " · " + s.title,
+      dday: dl > 0 ? "D-" + dl : (dl === 0 ? "D-DAY" : "지남")
+    });
+  });
+  window.CONF_DDL_MAP = m;
+}
+
+function renderDdlBanner(){
+  var el = document.getElementById("ddlBanner");
+  if(!el) return;
+  var items = [];
+  CC_DATA.forEach(function(x){
+    var dl = ccDaysLeft(x.ddl);
+    if(dl >= 0 && dl <= 30) items.push({dl:dl, proj:(x.cfd==="projected"), label:x.venue+" "+x.year, i:x._i, kind:"conf"});
+    var am = /(\d{4}-\d{2}-\d{2})/.exec(x.abs || "");
+    if(am){
+      var adl = ccDaysLeft(am[1]);
+      if(adl >= 0 && adl <= 30) items.push({dl:adl, proj:(x.cfd==="projected")||(x.abs||"").indexOf("~")!==-1, label:x.venue+" "+x.year+" abs", i:x._i, kind:"conf"});
+    }
+  });
+  (SI_DATA.items || []).forEach(function(s){
+    if(!s.ddl || s.relevant === false) return;
+    var dl = ccDaysLeft(s.ddl);
+    if(dl >= 0 && dl <= 30) items.push({dl:dl, proj:false, label:s.journal+" SI", kind:"si", t:s.title});
+  });
+  if(!items.length){ el.style.display = "none"; return; }
+  items.sort(function(a,b){ return a.dl - b.dl; });
+  el.innerHTML = '<span class="ddl-banner-icon">⏰</span>' + items.map(function(it){
+    var d = it.dl === 0 ? "D-DAY" : "D-" + it.dl;
+    var click = it.kind === "si" ? "ccJumpSI()" : "ccJumpDetail(" + it.i + ")";
+    return '<span class="ddl-chip' + (it.proj ? ' proj' : '') + (it.dl <= 7 ? ' urgent' : '') + '" onclick="' + click + '" title="' + (it.t || it.label) + '">' +
+      it.label + ' <b>' + d + '</b></span>';
+  }).join('');
+  el.style.display = "flex";
+}
+
+function ccJumpDetail(i){
+  var btns = document.querySelectorAll(".tabs .tab");
+  if(btns[2]) btns[2].click();
+  if(ccView !== "list") ccSetView("list");
+  setTimeout(function(){ ccShowDetail(i); }, 60);
+}
+function ccJumpSI(){
+  var btns = document.querySelectorAll(".tabs .tab");
+  if(btns[2]) btns[2].click();
+  ccSetView("si");
+}
+
+function ccRenderSI(){
+  var wrap = document.getElementById("ccSIWrap");
+  if(!wrap) return;
+  var items = (SI_DATA.items || []).slice().sort(function(a,b){ return (a.ddl||"9999") < (b.ddl||"9999") ? -1 : 1; });
+  var checked = SI_DATA.last_checked ? String(SI_DATA.last_checked).slice(0,10) : null;
+  var h = '<div class="cc-note">저널 <b>스페셜 이슈/섹션</b> 공개 모집 현황. IEEE SPS 공식 마감 페이지를 GitHub Actions가 <b>매주 월요일</b> 자동 수집한다' +
+    (checked ? ' (마지막 확인: ' + checked + ')' : '') +
+    '. 관련성 낮은 항목은 흐리게 표시. TCSVT·MDPI·Elsevier 계열은 자동 수집 대상이 아니므로 발견 시 <code>data/special_issues.json</code>에 <code>"source":"manual"</code>로 추가.</div>';
+  if(!items.length){ wrap.innerHTML = h + '<div class="cc-empty">현재 등록된 스페셜 이슈가 없습니다.</div>'; return; }
+  h += '<div class="si-grid">';
+  items.forEach(function(s){
+    var dl = s.ddl ? ccDaysLeft(s.ddl) : null;
+    var badge = dl === null ? '' :
+      dl < 0 ? '<span class="cc-badge passed">지난 마감</span>' :
+      '<span class="cc-badge upcoming">' + (dl === 0 ? 'D-DAY' : 'D-' + dl) + '</span>';
+    h += '<div class="si-card' + (s.relevant === false ? ' si-dim' : '') + (dl !== null && dl < 0 ? ' si-passed' : '') + '">' +
+      '<div class="si-top"><span class="si-journal">' + s.journal + '</span>' + badge + '</div>' +
+      '<div class="si-title">' + s.title + '</div>' +
+      '<div class="si-meta">마감 ' + (s.ddl ? ccYmd(s.ddl) : '미정') + (s.pub ? ' · 게재 ' + s.pub : '') +
+        (s.source === 'manual' ? ' · <span class="si-src">수동 등록</span>' : '') + '</div>' +
+      (s.note ? '<div class="si-note">' + s.note + '</div>' : '') +
+      (s.url ? '<a class="jr-lnk" href="' + s.url + '" target="_blank" rel="noopener">Call for Papers ↗</a>' : '') +
+      '</div>';
+  });
+  h += '</div>';
+  wrap.innerHTML = h;
+}
+
+// ---- 데이터 로드 (conferences.json 실패 시 내장 fallback) ----
+(function ccLoadData(){
+  function getJSON(url){ return fetch(url + "?t=" + Date.now()).then(function(r){ if(!r.ok) throw new Error(url); return r.json(); }); }
+  Promise.all([
+    getJSON("data/conferences.json"),
+    getJSON("data/special_issues.json").catch(function(){ return { items: [] }; })
+  ]).then(function(res){
+    CC_DATA = res[0];
+    SI_DATA = res[1] || { items: [] };
+  }).catch(function(e){
+    console.warn("data/conferences.json 로드 실패 — 내장 fallback 사용", e);
+    CC_DATA = CC_FALLBACK;
+  }).then(function(){
+    ccInitFromData();
+    buildConfDdlMap();
+    renderDdlBanner();
+    if(document.getElementById("confcalSection").classList.contains("active")) renderConfCal();
+    if(typeof renderCalendar === "function" && document.getElementById("scheduleSection").classList.contains("active")){
+      renderCalendar();
+      if(typeof selectedDate !== "undefined" && selectedDate) selectDate(selectedDate);
+    }
+  });
+})();
 </script>
 </body>
 </html>
