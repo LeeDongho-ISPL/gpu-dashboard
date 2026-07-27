@@ -1,17 +1,7 @@
 {
-  "last_checked": "2026-07-20T03:39:38Z",
+  "last_checked": "2026-07-27T03:39:14Z",
   "source": "https://signalprocessingsociety.org/publications-resources/special-issue-deadlines",
   "items": [
-    {
-      "journal": "TMM",
-      "title": "Special Section on Multimodal Video Compression and Reconstruction: Theory, Algorithms, and Applications",
-      "ddl": "2026-07-30",
-      "url": "https://signalprocessingsociety.org/events/ieee-tmm-special-section-multimodal-video-compression-and-reconstruction-theory-algorithms",
-      "relevant": true,
-      "source": "sps-auto",
-      "note": "learning-based codec / 압축 열화 복원 / SR·보간 / immersive XR 스트리밍",
-      "pub": "2027 Q1"
-    },
     {
       "journal": "JSTSP",
       "title": "Signal Processing for Trustworthiness in 6G Wireless Ecosystems",
@@ -32,13 +22,22 @@
       "pub": "2027 Q1"
     },
     {
-      "journal": "SPM",
-      "title": "Signal Processing for Fluid Antenna Systems: Foundations, Algorithms, and Emerging Applications",
-      "ddl": "2026-08-01",
-      "url": "https://signalprocessingsociety.org/events/ieee-spm-signal-processing-fluid-antenna-systems-foundations-algorithms-and-emerging",
-      "relevant": false,
+      "journal": "TMM",
+      "title": "Special Section on Multimodal Video Compression and Reconstruction: Theory, Algorithms, and Applications",
+      "ddl": "2026-08-20",
+      "url": "https://signalprocessingsociety.org/events/ieee-tmm-special-section-multimodal-video-compression-and-reconstruction-theory-algorithms",
+      "relevant": true,
       "source": "sps-auto",
-      "pub": "2027-12"
+      "note": "learning-based codec / 압축 열화 복원 / SR·보간 / immersive XR 스트리밍",
+      "pub": "2027 Q1"
+    },
+    {
+      "journal": "Call",
+      "title": "Call for Papers: Signal Processing for Fluid Antenna Systems: Foundations, Algorithms, and Emerging Applications",
+      "ddl": "2026-09-01",
+      "url": "https://signalprocessingsociety.org/events/call-papers-signal-processing-fluid-antenna-systems-foundations-algorithms-and-emerging",
+      "relevant": false,
+      "source": "sps-auto"
     }
   ]
 }
