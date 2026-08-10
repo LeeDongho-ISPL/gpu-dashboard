@@ -1,7 +1,15 @@
 {
-  "last_checked": "2026-08-03T03:31:24Z",
+  "last_checked": "2026-08-10T02:11:15Z",
   "source": "https://signalprocessingsociety.org/publications-resources/special-issue-deadlines",
   "items": [
+    {
+      "journal": "TMM",
+      "title": "Special Section on Generative AI for World Simulations and Communications",
+      "ddl": "2026-08-15",
+      "url": "https://signalprocessingsociety.org/events/ieee-tmm-special-section-generative-ai-world-simulations-and-communications",
+      "relevant": true,
+      "source": "sps-auto"
+    },
     {
       "journal": "IEEE",
       "title": "IEEE J-STSP Signal Processing for Trustworthiness in 6G Wireless Ecosystems",
