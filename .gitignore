@@ -10,3 +10,7 @@ cal_sync_report.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Python bytecode cache
+__pycache__/
+*.pyc

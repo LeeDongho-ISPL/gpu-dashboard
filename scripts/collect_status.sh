@@ -25,7 +25,9 @@ build_ssh_cmd() {
     local host="$1"
     local port="$2"
     local user="$3"
+    local key="${4:-}"
     local ssh_opts="-o ConnectTimeout=15 -o StrictHostKeyChecking=no -o BatchMode=yes"
+    if [ -n "$key" ]; then ssh_opts="$ssh_opts -i $key"; fi
 
     echo "ssh $ssh_opts -p $port $user@$host"
 }
@@ -37,11 +39,12 @@ collect_gpu_server() {
     local user="$4"
     local gpu_count="$5"
     local gpu_mem="$6"
+    local key="${7:-}"
 
     echo "Collecting from $name..." >&2
 
     local ssh_cmd
-    ssh_cmd=$(build_ssh_cmd "$host" "$port" "$user")
+    ssh_cmd=$(build_ssh_cmd "$host" "$port" "$user" "$key")
 
     local raw_data
     raw_data=$($ssh_cmd bash <<'REMOTE_SCRIPT'
@@ -259,7 +262,7 @@ echo "Starting collection at $TIMESTAMP"
 
 # GPU Servers
 # (NIPA_server 제거됨 — 2026-07 NIPA 지원 종료)
-ISPL_JSON=$(collect_gpu_server "ISPL" "$ISPL_IP" "$ISPL_PORT" "$ISPL_USER" 8 48)
+ISPL_JSON=$(collect_gpu_server "ISPL" "$ISPL_IP" "$ISPL_PORT" "$ISPL_USER" 8 48 "${ISPL_KEY:-}")
 
 # CPU Servers
 CPU1_JSON=$(collect_cpu_server "CPU1" "$CPU1_IP" "$CPU_PORT" "$CPU_USER")

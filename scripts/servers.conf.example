@@ -6,6 +6,7 @@
 ISPL_IP=YOUR_ISPL_IP
 ISPL_PORT=15422
 ISPL_USER=ispl
+ISPL_KEY=~/.ssh/id_ed25519_ispl   # IdentityFile (optional; leave blank to use default key/agent)
 
 # CPU 서버들 (내부망)
 CPU1_IP=YOUR_CPU1_IP

@@ -113,21 +113,21 @@
     "venue": "ICLR",
     "type": "ml",
     "year": 2027,
-    "ddl": "2026-09-24",
-    "abs": "—",
-    "conf": "2027.4",
-    "loc": "West Coast NA",
-    "cfd": "projected"
+    "ddl": "2026-09-25",
+    "abs": "2026-09-18",
+    "conf": "2027.4.26–30",
+    "loc": "California, US",
+    "cfd": "confirmed"
   },
   {
     "venue": "CVPR",
     "type": "cv",
     "year": 2027,
-    "ddl": "2026-11-13",
-    "abs": "~2026-11-06",
-    "conf": "2027.6.19–26",
+    "ddl": "2026-11-16",
+    "abs": "2026-11-23 (supp)",
+    "conf": "2027.6.20–24",
     "loc": "Seattle, US",
-    "cfd": "projected",
+    "cfd": "confirmed",
     "confOK": true
   },
   {
@@ -136,19 +136,19 @@
     "year": 2027,
     "ddl": "2027-01-21",
     "abs": "form ~1월 중순",
-    "conf": "2027.8",
-    "loc": "TBD",
+    "conf": "2027.8.8–12",
+    "loc": "Anaheim, US",
     "cfd": "projected"
   },
   {
     "venue": "ICML",
     "type": "ml",
     "year": 2027,
-    "ddl": "2027-01-28",
-    "abs": "~1월말",
+    "ddl": "2027-01-22",
+    "abs": "2027-01-16",
     "conf": "2027.7",
-    "loc": "TBD",
-    "cfd": "projected"
+    "loc": "South America",
+    "cfd": "confirmed"
   },
   {
     "venue": "ICCV",
