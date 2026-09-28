@@ -1,11 +1,11 @@
 {
-  "last_updated": "2026-09-28T02:21:37Z",
+  "last_updated": "2026-09-28T02:37:54Z",
   "servers": [
     {
   "name": "ISPL",
   "type": "gpu",
   "status": "offline",
-  "timestamp": "2026-09-28T02:21:37Z",
+  "timestamp": "2026-09-28T02:37:54Z",
   "gpu_count": 8,
   "gpu_memory_gb": 48,
   "gpus": [],
@@ -18,28 +18,28 @@
     {
   "name": "CPU1",
   "type": "cpu",
-  "status": "offline",
-  "timestamp": "2026-09-28T02:21:37Z",
-  "cpu": {},
-  "memory": {},
-  "disk": {},
+  "status": "online",
+  "timestamp": "2026-09-28T02:37:54Z",
+  "cpu": {"cores": 64, "load_avg": 0.75, "usage_percent": 0.0},
+  "memory": {"used_mb": 1697, "total_mb": 773343, "percent": 0.2},
+  "disk": {"used": "38G", "total": "879G", "percent": 5},
   "users": []
 },
     {
   "name": "CPU2",
   "type": "cpu",
-  "status": "offline",
-  "timestamp": "2026-09-28T02:21:37Z",
-  "cpu": {},
-  "memory": {},
-  "disk": {},
-  "users": []
+  "status": "online",
+  "timestamp": "2026-09-28T02:37:54Z",
+  "cpu": {"cores": 64, "load_avg": 0.94, "usage_percent": 0.3},
+  "memory": {"used_mb": 2853, "total_mb": 773343, "percent": 0.4},
+  "disk": {"used": "45G", "total": "879G", "percent": 6},
+  "users": ["user"]
 },
     {
   "name": "CPU3",
   "type": "cpu",
   "status": "offline",
-  "timestamp": "2026-09-28T02:21:37Z",
+  "timestamp": "2026-09-28T02:37:54Z",
   "cpu": {},
   "memory": {},
   "disk": {},
@@ -49,7 +49,7 @@
   "name": "CPU4",
   "type": "cpu",
   "status": "offline",
-  "timestamp": "2026-09-28T02:21:37Z",
+  "timestamp": "2026-09-28T02:37:54Z",
   "cpu": {},
   "memory": {},
   "disk": {},
