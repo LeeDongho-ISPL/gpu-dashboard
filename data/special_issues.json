@@ -1,16 +1,5 @@
 {
-  "last_checked": "2026-09-28T04:47:32Z",
+  "last_checked": "2026-10-05T05:01:50Z",
   "source": "https://signalprocessingsociety.org/publications-resources/special-issue-deadlines",
-  "items": [
-    {
-      "journal": "TMM",
-      "title": "Special Section on Multimodal Video Compression and Reconstruction: Theory, Algorithms, and Applications",
-      "ddl": "2026-09-15",
-      "url": "https://signalprocessingsociety.org/events/ieee-tmm-special-section-multimodal-video-compression-and-reconstruction-theory-algorithms",
-      "relevant": true,
-      "source": "sps-auto",
-      "note": "learning-based codec / 압축 열화 복원 / SR·보간 / immersive XR 스트리밍",
-      "pub": "2027 Q1"
-    }
-  ]
+  "items": []
 }
