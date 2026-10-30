@@ -1,15 +1,5 @@
 [
   {
-    "venue": "3DV",
-    "type": "d3",
-    "year": 2026,
-    "ddl": "2025-08-18",
-    "abs": "2025-08-21 (supp)",
-    "conf": "2026.3.20–23",
-    "loc": "Vancouver, CA",
-    "cfd": "confirmed"
-  },
-  {
     "venue": "AAAI",
     "type": "ml",
     "year": 2026,
@@ -17,6 +7,16 @@
     "abs": "2025-08-08",
     "conf": "2026.1",
     "loc": "Singapore",
+    "cfd": "confirmed"
+  },
+  {
+    "venue": "3DV",
+    "type": "d3",
+    "year": 2026,
+    "ddl": "2025-08-18",
+    "abs": "2025-08-21 (supp)",
+    "conf": "2026.3.20–23",
+    "loc": "Vancouver, CA",
     "cfd": "confirmed"
   },
   {
@@ -35,7 +35,7 @@
     "year": 2026,
     "ddl": "2025-11-14",
     "abs": "2025-11-07",
-    "conf": "2026.6",
+    "conf": "2026.6.3–7",
     "loc": "Denver, US",
     "cfd": "confirmed"
   },
@@ -45,7 +45,7 @@
     "year": 2026,
     "ddl": "2026-01-22",
     "abs": "form 2026-01-15",
-    "conf": "2026.8",
+    "conf": "2026.7.19–23",
     "loc": "Los Angeles, US",
     "cfd": "confirmed"
   },
@@ -55,7 +55,7 @@
     "year": 2026,
     "ddl": "2026-01-28",
     "abs": "2026-01-22",
-    "conf": "2026.7",
+    "conf": "2026.7.6–11",
     "loc": "Seoul, KR",
     "cfd": "confirmed"
   },
@@ -75,8 +75,8 @@
     "year": 2026,
     "ddl": "2026-05-06",
     "abs": "2026-05-04",
-    "conf": "2026.12",
-    "loc": "San Diego, US",
+    "conf": "2026.12.6–13",
+    "loc": "Sydney, AU · Atlanta · Paris",
     "cfd": "confirmed"
   },
   {
@@ -85,8 +85,8 @@
     "year": 2026,
     "ddl": "2026-05-12",
     "abs": "stage-1 2026-05-05",
-    "conf": "2026.12",
-    "loc": "TBD",
+    "conf": "2026.12.1–4",
+    "loc": "Kuala Lumpur, MY",
     "cfd": "confirmed"
   },
   {
@@ -116,7 +116,7 @@
     "ddl": "2026-09-25",
     "abs": "2026-09-18",
     "conf": "2027.4.26–30",
-    "loc": "California, US",
+    "loc": "West Coast NA (TBA)",
     "cfd": "confirmed"
   },
   {
@@ -124,7 +124,7 @@
     "type": "cv",
     "year": 2027,
     "ddl": "2026-11-16",
-    "abs": "2026-11-23 (supp)",
+    "abs": "2026-11-10 (등록) · supp 11-23",
     "conf": "2027.6.20–24",
     "loc": "Seattle, US",
     "cfd": "confirmed",
@@ -138,27 +138,29 @@
     "abs": "form ~1월 중순",
     "conf": "2027.8.8–12",
     "loc": "Anaheim, US",
-    "cfd": "projected"
+    "cfd": "projected",
+    "confOK": true
   },
   {
     "venue": "ICML",
     "type": "ml",
     "year": 2027,
     "ddl": "2027-01-22",
-    "abs": "2027-01-16",
+    "abs": "~2027-01-16",
     "conf": "2027.7",
-    "loc": "South America",
-    "cfd": "confirmed"
+    "loc": "South America (TBA)",
+    "cfd": "projected"
   },
   {
     "venue": "ICCV",
     "type": "cv",
     "year": 2027,
     "ddl": "2027-03-08",
-    "abs": "~3월 초",
-    "conf": "2027.10",
+    "abs": "~2027-03-01",
+    "conf": "2027.10.2–8",
     "loc": "Hong Kong",
-    "cfd": "projected"
+    "cfd": "projected",
+    "confOK": true
   },
   {
     "venue": "SIGGRAPH Asia",
@@ -166,8 +168,8 @@
     "year": 2027,
     "ddl": "2027-05-11",
     "abs": "stage-1 ~5월 초",
-    "conf": "2027.12",
-    "loc": "TBD",
+    "conf": "2027.11.30–12.3",
+    "loc": "Tokyo, JP",
     "cfd": "projected"
   },
   {
@@ -177,7 +179,7 @@
     "ddl": "2027-05-12",
     "abs": "~5월 초",
     "conf": "2027.12",
-    "loc": "TBD",
+    "loc": "Europe (TBA)",
     "cfd": "projected"
   },
   {
@@ -237,7 +239,7 @@
     "ddl": "2028-01-28",
     "abs": "~1월말",
     "conf": "2028.7",
-    "loc": "TBD",
+    "loc": "Eastern US (TBA)",
     "cfd": "projected"
   },
   {
@@ -251,21 +253,21 @@
     "cfd": "projected"
   },
   {
-    "venue": "SIGGRAPH Asia",
-    "type": "gfx",
-    "year": 2028,
-    "ddl": "2028-05-10",
-    "abs": "stage-1 ~5월 초",
-    "conf": "2028.12",
-    "loc": "TBD",
-    "cfd": "projected"
-  },
-  {
     "venue": "NeurIPS",
     "type": "ml",
     "year": 2028,
     "ddl": "2028-05-10",
     "abs": "~5월 초",
+    "conf": "2028.12",
+    "loc": "Western US (TBA)",
+    "cfd": "projected"
+  },
+  {
+    "venue": "SIGGRAPH Asia",
+    "type": "gfx",
+    "year": 2028,
+    "ddl": "2028-05-10",
+    "abs": "stage-1 ~5월 초",
     "conf": "2028.12",
     "loc": "TBD",
     "cfd": "projected"
@@ -341,21 +343,21 @@
     "cfd": "projected"
   },
   {
-    "venue": "SIGGRAPH Asia",
-    "type": "gfx",
-    "year": 2029,
-    "ddl": "2029-05-09",
-    "abs": "stage-1 ~5월 초",
-    "conf": "2029.12",
-    "loc": "TBD",
-    "cfd": "projected"
-  },
-  {
     "venue": "NeurIPS",
     "type": "ml",
     "year": 2029,
     "ddl": "2029-05-09",
     "abs": "~5월 초",
+    "conf": "2029.12",
+    "loc": "TBD",
+    "cfd": "projected"
+  },
+  {
+    "venue": "SIGGRAPH Asia",
+    "type": "gfx",
+    "year": 2029,
+    "ddl": "2029-05-09",
+    "abs": "stage-1 ~5월 초",
     "conf": "2029.12",
     "loc": "TBD",
     "cfd": "projected"
